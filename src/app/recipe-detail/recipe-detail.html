@@ -1,0 +1,45 @@
+<div *ngIf="recipe()" class="max-w-2xl mx-auto p-4 font-sans text-gray-800">
+    <button (click)="goBack()" class="text-sm text-emerald-600 hover:underline mb-4 block">
+      ⬅️ Back to list
+    </button>
+
+    <h1 class="text-3xl font-bold mb-4 text-emerald-700">{{ recipe()!.title }}</h1>
+
+    <div class="bg-gray-100 p-4 rounded-lg mb-6 flex items-center gap-4">
+      <label class="font-medium">Servings:</label>
+      <input 
+        type="number" 
+        [ngModel]="currentServings()" 
+        (ngModelChange)="updateServings($event)"
+        min="1" 
+        class="w-20 p-1 border rounded text-center text-lg font-bold"
+      />
+      <span class="text-sm text-gray-500">(Base: {{ baseServings() }})</span>
+      <span class="text-sm bg-emerald-100 text-emerald-800 px-2 py-1 rounded font-mono">
+        x{{ multiplier().toFixed(2) }}
+      </span>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-2 border-b pb-1">Ingredients</h2>
+      <ul class="list-disc pl-5 space-y-1">
+        @for(ing of objectValues(recipe()!.ingredients); track $index) {
+          <li>
+            <strong>{{ +(ing.value.qty * multiplier()).toFixed(2) }}{{ ing.value.unit }}</strong> 
+            {{ ing.value.name }}
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-semibold mb-2 border-b pb-1">Procedure</h2>
+      <ol class="list-decimal pl-5 space-y-4">
+        @for(step of parsedSteps(); track $index) {
+          <li>
+            <div [innerHTML]="step" (click)="handleStepClick($event)"></div>
+          </li>
+        }
+      </ol>
+    </div>
+  </div>

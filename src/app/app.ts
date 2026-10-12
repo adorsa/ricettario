@@ -1,12 +1,25 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { RecipeListComponent } from './recipe-list/recipe-list';
+import { Supabase } from './supabase';
+import { TimerWidgetComponent } from './timer-widget/timer-widget';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, TimerWidgetComponent],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
 export class App {
+  private supabaseService = inject(Supabase);
+  private router = inject(Router);
   protected readonly title = signal('ricettario');
+
+  newRecipe() {
+    this.router.navigate(['/recipes/new']);
+  }
+
+  logout() {
+    this.supabaseService.signOut();
+  }
 }

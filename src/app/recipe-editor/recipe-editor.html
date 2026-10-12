@@ -1,0 +1,144 @@
+<div class="max-w-2xl mx-auto p-4 font-sans text-gray-800 bg-white rounded-lg shadow border border-gray-200 mt-4">
+    <div class="flex justify-between items-center mb-6 border-b pb-2">
+    <h2 class="text-2xl font-bold text-emerald-700">Nuova Ricetta</h2>
+    <button 
+        (click)="onCancel.emit()" 
+        class="text-sm text-gray-500 hover:text-gray-700 font-medium"
+    >
+        Annulla
+    </button>
+    </div>
+
+    <form (ngSubmit)="saveRecipe()" #recipeForm="ngForm" class="space-y-6">
+    <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2">
+        <label class="block text-sm font-medium mb-1">Titolo Ricetta</label>
+        <input 
+            type="text" 
+            [(ngModel)]="title" 
+            name="title" 
+            required 
+            class="w-full p-2 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            placeholder="Es: Carbonara MVP"
+        />
+        </div>
+        <div>
+        <label class="block text-sm font-medium mb-1">Porzioni Base</label>
+        <input 
+            type="number" 
+            [(ngModel)]="servingsBase" 
+            name="servingsBase" 
+            required 
+            min="1"
+            class="w-full p-2 border rounded text-center focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+        />
+        </div>
+    </div>
+
+    <div class="border-t pt-4">
+        <h3 class="text-lg font-semibold mb-3 text-gray-700">1. Lista Ingredienti</h3>
+        
+        <div class="space-y-2 mb-3">
+        <div 
+            *ngFor="let item of objectKeys(ingredients)" 
+            class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100 text-sm"
+        >
+            <div>
+            <span class="font-mono text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded mr-2">{{ item }}</span>
+            <strong>{{ ingredients[item].qty }}{{ ingredients[item].unit }}</strong> di {{ ingredients[item].name }}
+            </div>
+            <button 
+            type="button" 
+            (click)="removeIngredient(item)" 
+            class="text-red-500 hover:text-red-700 font-medium"
+            >
+            Rimuovi
+            </button>
+        </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-2 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
+        <input 
+            type="text" 
+            [(ngModel)]="newIngName" 
+            name="newIngName" 
+            placeholder="Nome (es: Farina)" 
+            class="col-span-6 p-1.5 border rounded text-sm focus:outline-emerald-500"
+        />
+        <input 
+            type="number" 
+            [(ngModel)]="newIngQty" 
+            name="newIngQty" 
+            placeholder="Qtà" 
+            class="col-span-3 p-1.5 border rounded text-sm text-center focus:outline-emerald-500"
+        />
+        <input 
+            type="text" 
+            [(ngModel)]="newIngUnit" 
+            name="newIngUnit" 
+            placeholder="Unità" 
+            class="col-span-2 p-1.5 border rounded text-sm text-center focus:outline-emerald-500"
+        />
+        <button 
+            type="button" 
+            (click)="addIngredient()" 
+            class="col-span-1 bg-emerald-600 text-white font-bold rounded hover:bg-emerald-700 flex items-center justify-center text-lg"
+        >
+            +
+        </button>
+        </div>
+    </div>
+
+    <div class="border-t pt-4">
+        <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-semibold text-gray-700">2. Passaggi della Preparazione</h3>
+        <button 
+            type="button" 
+            (click)="addStepField()" 
+            class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1 px-2 rounded"
+        >
+            + Add step
+        </button>
+        </div>
+        
+        <p class="text-xs text-gray-500 mb-3 bg-blue-50 p-2 rounded border border-blue-100 leading-relaxed">
+        💡 <strong>Tag syntax:</strong> Write <code class="bg-gray-200 px-0.5 rounded">[i:ing_1]</code> for the full ingredient, or add an extra part like this: <code class="bg-gray-200 px-0.5 rounded">[i:ing_1:0.5]</code> for fractions (in this example, 50%), and <code class="bg-gray-200 px-0.5 rounded">[t:15:Testo]</code> to set a timer (in the example, 15 minutes).
+        </p>
+
+        <div class="space-y-3">
+        @for(step of steps; track $index) {
+            <div class="flex gap-2 items-start">
+                <span class="font-bold text-gray-400 mt-2 text-sm w-4">{{ $index + 1 }}.</span>
+                <textarea 
+                [(ngModel)]="steps[$index]" 
+                [name]="'step_' + $index" 
+                required
+                rows="2"
+                class="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Versa [i:ing_1] nella ciotola e mescola per [t:5:5 minuti]."
+                ></textarea>
+                <button 
+                type="button" 
+                (click)="removeStepField($index)" 
+                [disabled]="steps.length === 1"
+                class="text-red-400 hover:text-red-600 mt-2 font-medium text-sm disabled:opacity-30"
+                >
+                ✕
+                </button>
+            </div>
+        }
+        </div>
+    </div>
+
+    <!-- Pulsante di Salvataggio -->
+    <div class="border-t pt-4 text-right">
+        <button 
+        type="submit" 
+        [disabled]="recipeForm.invalid || objectKeys(ingredients).length === 0 || isLoading()"
+        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded transition-colors disabled:opacity-50"
+        >
+        {{ isLoading() ? 'Salvataggio in corso...' : 'Salva Ricetta su Supabase' }}
+        </button>
+    </div>
+    </form>
+</div>
