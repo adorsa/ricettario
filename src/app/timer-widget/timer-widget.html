@@ -1,46 +1,40 @@
-<div 
-    *ngIf="timerService.timeRemaining() > 0"
-    class="fixed bottom-6 right-6 left-6 md:left-auto md:w-80 bg-slate-950 text-white p-4 rounded-xl shadow-2xl border border-slate-800 font-sans z-50 transition-all duration-300"
->
-    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
-    <div 
-        class="bg-emerald-500 h-full transition-all duration-1000 ease-linear"
-        [style.width.%]="timerService.progressPercentage()"
-    ></div>
-    </div>
+@if(timerService.timeRemaining() > 0) {
+    <div class="fixed bottom-6 right-6 left-6 md:left-auto md:w-80 bg-slate-950 text-white p-4 rounded-xl shadow-2xl border border-slate-800 font-sans z-50 transition-all duration-300">
+        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
+        <div 
+            class="bg-emerald-500 h-full transition-all duration-1000 ease-linear"
+            [style.width.%]="timerService.progressPercentage()"
+        ></div>
+        </div>
 
-    <div class="flex justify-between items-center mb-2">
-    <div class="truncate pr-2">
-        <span class="text-xs text-slate-400 block font-medium uppercase tracking-wider">Current step</span>
-        <strong class="text-sm font-semibold text-emerald-400 block truncate">{{ timerService.label() }}</strong>
-    </div>
-    <div class="text-2xl font-mono font-bold tracking-tight text-white bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-        {{ timerService.formattedTime() }}
-    </div>
-    </div>
+        <div class="flex justify-between items-center mb-2">
+        <div class="truncate pr-2">
+            <span class="text-xs text-slate-400 block font-medium uppercase tracking-wider">Current step</span>
+            <strong class="text-sm font-semibold text-emerald-400 block truncate">{{ timerService.label() }}</strong>
+        </div>
+        <div class="text-2xl font-mono font-bold tracking-tight text-white bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+            {{ timerService.formattedTime() }}
+        </div>
+        </div>
 
-    <div class="flex gap-2 mt-4 pt-2 border-t border-slate-900">
-    <button 
-        *ngIf="timerService.isRunning(); else resumeBtn"
-        (click)="timerService.pauseTimer()"
-        class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-1.5 px-3 rounded-lg text-xs transition-colors"
-    >
-        ⏸️ Pause
-    </button>
-    <ng-template #resumeBtn>
+        <div class="flex gap-2 mt-4 pt-2 border-t border-slate-900">
+        @if(timerService.isRunning()) {
+            <button (click)="timerService.pauseTimer()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-1.5 px-3 rounded-lg text-xs transition-colors">
+                ⏸️ Pause
+            </button>
+        }
+        @else {
+            <button (click)="timerService.resumeTimer()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-lg text-xs transition-colors">
+                ▶️ Resume
+            </button>
+        }
+
         <button 
-        (click)="timerService.resumeTimer()"
-        class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-lg text-xs transition-colors"
+            (click)="timerService.resetTimer()"
+            class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium py-1.5 px-3 rounded-lg text-xs transition-colors"
         >
-        ▶️ Resume
+            ✕ Cancel
         </button>
-    </ng-template>
-
-    <button 
-        (click)="timerService.resetTimer()"
-        class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium py-1.5 px-3 rounded-lg text-xs transition-colors"
-    >
-        ✕ Cancel
-    </button>
+        </div>
     </div>
-</div>
+}

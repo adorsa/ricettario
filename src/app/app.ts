@@ -1,11 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, RouterLinkWithHref } from '@angular/router';
 import { RecipeListComponent } from './recipe-list/recipe-list';
 import { Supabase } from './supabase';
 import { TimerWidgetComponent } from './timer-widget/timer-widget';
 
 @Component({
-  imports: [RouterOutlet, TimerWidgetComponent],
+  imports: [RouterOutlet, TimerWidgetComponent, RouterLinkWithHref],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

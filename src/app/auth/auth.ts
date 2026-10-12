@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Supabase } from './../supabase';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -12,6 +13,7 @@ import { Supabase } from './../supabase';
 })
 export class Auth {
   private supabaseService = inject(Supabase);
+  private router = inject(Router);
 
   email = '';
   password = '';
@@ -38,6 +40,7 @@ export class Auth {
       if (this.isLoginMode()) {
         await this.supabaseService.signIn(this.email, this.password);
         this.successMessage.set('Successfully logged in!');
+        this.router.navigate(['/']);
       } else {
         await this.supabaseService.signUp(this.email, this.password);
         this.successMessage.set('Account created. Check your email.');
