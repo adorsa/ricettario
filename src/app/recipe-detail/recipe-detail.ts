@@ -57,6 +57,13 @@ export class RecipeDetail implements OnInit {
   goBack() {
     this.router.navigate(['/recipes']);
   }
+  
+  goToEdit() {
+  const currentRecipe = this.recipe();
+  if (currentRecipe) {
+    this.router.navigate(['/recipes', currentRecipe.id, 'edit']);
+  }
+}
 
   handleStepClick(event: MouseEvent) {
     const target = event.target as HTMLElement;

@@ -9,6 +9,7 @@ export const routes: Routes = [
   { path: 'recipes', component: RecipeListComponent },
   { path: 'recipes/new', component: RecipeEditorComponent },
   { path: 'recipes/:id', component: RecipeDetail },
+  { path: 'recipes/:id/edit', component: RecipeEditorComponent },
   { path: '', redirectTo: '/recipes', pathMatch: 'full' },
   { path: '**', redirectTo: '/recipes' }
 ];
