@@ -1,86 +1,100 @@
-import { Injectable, signal, computed, Service } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 
-@Service()
+export interface ActiveTimer {
+  id: string;
+  label: string;
+  totalSeconds: number;
+  timeRemaining: number;
+  isRunning: boolean;
+  intervalId: any;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class Timer {
-  private timerId: any = null;
+  private activeTimersSignal = signal<ActiveTimer[]>([]);
 
-  private timeRemainingSignal = signal<number>(0);
-  private totalTimeSignal = signal<number>(0);
-  private isRunningSignal = signal<boolean>(false);
-  private labelSignal = signal<string>('Timer');
-
-  timeRemaining = computed(() => this.timeRemainingSignal());
-  isRunning = computed(() => this.isRunningSignal());
-  label = computed(() => this.labelSignal());
-
-  progressPercentage = computed(() => {
-    if (this.totalTimeSignal() === 0) return 0;
-    return ((this.totalTimeSignal() - this.timeRemainingSignal()) / this.totalTimeSignal()) * 100;
-  });
-
-  formattedTime = computed(() => {
-    const minutes = Math.floor(this.timeRemainingSignal() / 60);
-    const seconds = this.timeRemainingSignal() % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  });
+  activeTimers = computed(() => this.activeTimersSignal());
 
   startNewTimer(minutes: number, label: string) {
-    this.stopAndClear();
+    const totalSeconds = minutes * 60;
+    const timerId = 'timer_' + Date.now();
 
-    const seconds = minutes * 60;
-    this.totalTimeSignal.set(seconds);
-    this.timeRemainingSignal.set(seconds);
-    this.labelSignal.set(label);
-    this.isRunningSignal.set(true);
+    const newTimer: ActiveTimer = {
+      id: timerId,
+      label: label || 'Timer',
+      totalSeconds: totalSeconds,
+      timeRemaining: totalSeconds,
+      isRunning: true,
+      intervalId: null
+    };
 
-    this.timerId = setInterval(() => {
-      this.timeRemainingSignal.update(time => {
-        if (time <= 1) {
-          this.stopAndClear();
-          this.playAlarm();
-          return 0;
-        }
-        return time - 1;
-      });
+    newTimer.intervalId = setInterval(() => {
+      this.tick(timerId);
     }, 1000);
+
+    this.activeTimersSignal.update(timers => [...timers, newTimer]);
   }
 
-  pauseTimer() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
-      this.isRunningSignal.set(false);
-    }
-  }
-
-  resumeTimer() {
-    if (this.isRunningSignal() || this.timeRemainingSignal() <= 0) return;
-
-    this.isRunningSignal.set(true);
-    this.timerId = setInterval(() => {
-      this.timeRemainingSignal.update(time => {
-        if (time <= 1) {
-          this.stopAndClear();
-          this.playAlarm();
-          return 0;
+  private tick(timerId: string) {
+    this.activeTimersSignal.update(timers => 
+      timers.map(t => {
+        if (t.id === timerId) {
+          if (t.timeRemaining <= 1) {
+            clearInterval(t.intervalId);
+            this.playAlarm();
+            setTimeout(() => this.removeTimer(timerId), 60000);
+            return { ...t, timeRemaining: 0, isRunning: false };
+          }
+          return { ...t, timeRemaining: t.timeRemaining - 1 };
         }
-        return time - 1;
-      });
-    }, 1000);
+        return t;
+      })
+    );
   }
 
-  resetTimer() {
-    this.stopAndClear();
+  pauseTimer(timerId: string) {
+    this.activeTimersSignal.update(timers => 
+      timers.map(t => {
+        if (t.id === timerId && t.isRunning) {
+          clearInterval(t.intervalId);
+          return { ...t, isRunning: false, intervalId: null };
+        }
+        return t;
+      })
+    );
   }
 
-  private stopAndClear() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
+  resumeTimer(timerId: string) {
+    this.activeTimersSignal.update(timers => 
+      timers.map(t => {
+        if (t.id === timerId && !t.isRunning) {
+          const intervalId = setInterval(() => this.tick(timerId), 1000);
+          return { ...t, isRunning: true, intervalId };
+        }
+        return t;
+      })
+    );
+  }
+
+  removeTimer(timerId: string) {
+    const timer = this.activeTimersSignal().find(t => t.id === timerId);
+    if (timer && timer.intervalId) {
+      clearInterval(timer.intervalId);
     }
-    this.timeRemainingSignal.set(0);
-    this.totalTimeSignal.set(0);
-    this.isRunningSignal.set(false);
+    this.activeTimersSignal.update(timers => timers.filter(t => t.id !== timerId));
+  }
+
+  formatTime(seconds: number): string {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  getProgress(timer: ActiveTimer): number {
+    if (timer.totalSeconds === 0) return 0;
+    return ((timer.totalSeconds - timer.timeRemaining) / timer.totalSeconds) * 100;
   }
 
   private playAlarm() {
@@ -88,14 +102,11 @@ export class Timer {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-      
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
       gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-      
       oscillator.start();
       oscillator.stop(audioCtx.currentTime + 1);
     } catch (e) {
