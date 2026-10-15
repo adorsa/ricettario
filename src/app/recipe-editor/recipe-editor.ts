@@ -1,38 +1,41 @@
-import { Component, inject, signal, output, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Supabase } from '../supabase';
-import { IngredientsMap } from '../recipe.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SupabaseService } from '../supabase.service';
+import { IngredientsMap, RecipeStep } from '../recipe.model';
+
+interface EditableRecipeStep {
+  id: string;
+  text: string;
+  tempDependencies: string;
+}
 
 @Component({
   selector: 'app-recipe-editor',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './recipe-editor.html',
-  styleUrl: './recipe-editor.css'
+  templateUrl: './recipe-editor.component.html'
 })
-export class RecipeEditorComponent {
-  private supabaseService = inject(Supabase);
+export class RecipeEditorComponent implements OnInit {
+  private supabaseService = inject(SupabaseService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  // Stati della modalità
   isEditMode = signal<boolean>(false);
   recipeId: string | null = null;
+  isLoading = signal(false);
 
-  // Stato del form
   title = '';
   servingsBase = 4;
   ingredients: IngredientsMap = {};
-  steps: string[] = [''];
+  
+  steps: EditableRecipeStep[] = [{ id: '', text: '', tempDependencies: '' }];
 
-  // Campi temporanei ingrediente
   newIngName = '';
   newIngQty: number | null = null;
   newIngUnit = '';
 
-  isLoading = signal(false);
   private ingredientCounter = 1;
 
   async ngOnInit() {
@@ -47,7 +50,12 @@ export class RecipeEditorComponent {
           this.title = recipe.title;
           this.servingsBase = recipe.servings_base;
           this.ingredients = recipe.ingredients;
-          this.steps = recipe.steps;
+          
+          this.steps = recipe.steps.map(step => ({
+            id: step.id,
+            text: step.text,
+            tempDependencies: step.dependencies ? step.dependencies.join(', ') : ''
+          }));
 
           const keys = Object.keys(recipe.ingredients);
           if (keys.length > 0) {
@@ -56,24 +64,22 @@ export class RecipeEditorComponent {
           }
         }
       } catch (err) {
-        console.error('Errore nel caricamento della ricetta da modificare:', err);
+        console.error('Error loading recipe:', err);
         this.router.navigate(['/recipes']);
       } finally {
         this.isLoading.set(false);
       }
     }
   }
-  onSaveSuccess = output<void>();
-  onCancel = output<void>();
 
   addIngredient() {
-    if (!this.newIngName || !this.newIngQty) return;
+    if (!this.newIngName || this.newIngQty === null) return;
 
-    const ingId = `ing_${this.ingredientCounter++}`;
-    this.ingredients[ingId] = {
+    const id = `ing_${this.ingredientCounter++}`;
+    this.ingredients[id] = {
       name: this.newIngName,
       qty: this.newIngQty,
-      unit: this.newIngUnit
+      unit: this.newIngUnit || ''
     };
 
     this.newIngName = '';
@@ -81,20 +87,22 @@ export class RecipeEditorComponent {
     this.newIngUnit = '';
   }
 
-  removeIngredient(id: string) {
-    delete this.ingredients[id];
+  removeIngredient(key: string) {
+    delete this.ingredients[key];
   }
 
   addStepField() {
-    this.steps.push('');
+    this.steps.push({ id: '', text: '', tempDependencies: '' });
   }
 
   removeStepField(index: number) {
-    this.steps.splice(index, 1);
+    if (this.steps.length > 1) {
+      this.steps.splice(index, 1);
+    }
   }
 
   cancel() {
-    if (this.isEditMode()) {
+    if (this.isEditMode() && this.recipeId) {
       this.router.navigate(['/recipes', this.recipeId]);
     } else {
       this.router.navigate(['/recipes']);
@@ -106,7 +114,19 @@ export class RecipeEditorComponent {
 
     this.isLoading.set(true);
     try {
-      const cleanSteps = this.steps.filter(step => step.trim() !== '');
+      const cleanSteps: RecipeStep[] = this.steps
+        .filter(s => s.id.trim() !== '' && s.text.trim() !== '')
+        .map(s => {
+          const depsArray = s.tempDependencies
+            ? s.tempDependencies.split(',').map(d => d.trim()).filter(d => d !== '')
+            : [];
+
+          return {
+            id: s.id.trim(),
+            text: s.text,
+            dependencies: depsArray
+          };
+        });
 
       const recipeData = {
         title: this.title,
@@ -123,14 +143,14 @@ export class RecipeEditorComponent {
         this.router.navigate(['/recipes']);
       }
     } catch (err) {
-      console.error('Errore durante il salvataggio:', err);
-      alert('Si è verificato un errore durante il salvataggio.');
+      console.error('Error during save:', err);
+      alert('There was an error saving this recipe.');
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  objectKeys(obj: any): string[] {
-    return Object.keys(obj);
+  objectKeys(obj: any) { 
+    return Object.keys(obj); 
   }
 }

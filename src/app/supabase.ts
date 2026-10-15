@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, Service } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../environments/environment.development';
+import { Recipe } from 'recipe.model';
 
 @Service()
 export class Supabase {
@@ -59,25 +60,20 @@ export class Supabase {
     if (error) throw error;
   }
 
-  async createRecipe(recipe: { title: string; servings_base: number; ingredients: any; steps: string[] }) {
+  async createRecipe(recipe: Omit<Recipe, 'id' | 'user_id' | 'created_at'>) {
     const user = this.currentUserSignal();
     if (!user) throw new Error('Utente non autenticato');
 
     const { data, error } = await this.supabase
       .from('recipes')
-      .insert([
-        {
-          ...recipe,
-          user_id: user.id
-        }
-      ])
+      .insert([{ ...recipe, user_id: user.id }])
       .select();
 
     if (error) throw error;
     return data;
   }
 
-  async getRecipes() {
+  async getRecipes(): Promise<Recipe[]> {
     const user = this.currentUserSignal();
     if (!user) throw new Error('Utente non autenticato');
 
@@ -87,10 +83,10 @@ export class Supabase {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data as Recipe[];
   }
 
-  async getRecipeById(id: string) {
+  async getRecipeById(id: string): Promise<Recipe> {
     const { data, error } = await this.supabase
       .from('recipes')
       .select('*')
@@ -98,10 +94,10 @@ export class Supabase {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as Recipe;
   }
 
-  async updateRecipe(id: string, updates: { title?: string; servings_base?: number; ingredients?: any; steps?: string[] }) {
+  async updateRecipe(id: string, updates: Partial<Omit<Recipe, 'id' | 'user_id' | 'created_at'>>) {
     const { data, error } = await this.supabase
       .from('recipes')
       .update(updates)

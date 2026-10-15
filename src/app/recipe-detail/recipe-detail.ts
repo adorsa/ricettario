@@ -1,25 +1,24 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Supabase } from '../supabase';
-import { Recipe } from '../recipe.model';
-import { RecipeParser } from '../recipe-parser';
-import { Timer } from '../timer';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SupabaseService } from '../supabase.service';
+import { Recipe } from '../recipe.model';
+import { RecipeParserService } from '../recipe-parser.service';
+import { TimerService } from '../timer.service';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './recipe-detail.html',
-  styleUrl: './recipe-detail.css'
+  imports: [FormsModule],
+  templateUrl: './recipe-detail.component.html',
+  styleUrls: ['./recipe-detail.component.css']
 })
-export class RecipeDetail implements OnInit {
+export class RecipeDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private supabaseService = inject(Supabase);
-  private parserService = inject(RecipeParser);
-  private timerService = inject(Timer);
+  private supabaseService = inject(SupabaseService);
+  private parserService = inject(RecipeParserService);
+  private timerService = inject(TimerService);
 
   recipe = signal<Recipe | null>(null);
   baseServings = computed(() => this.recipe()?.servings_base ?? 4);
@@ -29,9 +28,11 @@ export class RecipeDetail implements OnInit {
   parsedSteps = computed(() => {
     const currentRecipe = this.recipe();
     if (!currentRecipe) return [];
-    return currentRecipe.steps.map(step => 
-      this.parserService.parseStep(step, currentRecipe.ingredients, this.multiplier())
-    );
+    return currentRecipe.steps.map(step => ({
+      id: step.id,
+      text: step.text,
+      html: this.parserService.parseStepText(step.text, currentRecipe.ingredients, this.multiplier())
+    }));
   });
 
   async ngOnInit() {
@@ -44,30 +45,31 @@ export class RecipeDetail implements OnInit {
           this.currentServings.set(data.servings_base);
         }
       } catch (err) {
-        console.error('Errore nel caricamento della ricetta:', err);
+        console.error('Error loading recipe:', err);
         this.router.navigate(['/recipes']);
       }
     }
   }
 
   updateServings(value: number) {
-    if (value && value > 0) this.currentServings.set(value);
+    if (value && value > 0) {
+      this.currentServings.set(value);
+    }
   }
 
-  goBack() {
-    this.router.navigate(['/recipes']);
+  goBack() { 
+    this.router.navigate(['/recipes']); 
   }
-  
+
   goToEdit() {
-  const currentRecipe = this.recipe();
-  if (currentRecipe) {
-    this.router.navigate(['/recipes', currentRecipe.id, 'edit']);
+    const currentRecipe = this.recipe();
+    if (currentRecipe) {
+      this.router.navigate(['/recipes', currentRecipe.id, 'edit']);
+    }
   }
-}
 
-  handleStepClick(event: MouseEvent) {
+  handleStepClick(event: MouseEvent, stepId: string, stepText: string) {
     const target = event.target as HTMLElement;
-    
     const timerBtn = target.closest('.timer-btn') as HTMLElement;
     
     if (timerBtn) {
@@ -75,15 +77,12 @@ export class RecipeDetail implements OnInit {
       event.stopPropagation();
 
       const minutesStr = timerBtn.getAttribute('data-minutes');
-      
       const fullText = timerBtn.innerText || '';
       const label = fullText.replace('⏱️', '').trim();
 
       if (minutesStr) {
         const minutes = parseInt(minutesStr, 10);
-        console.log(`Timer started: ${minutes} minuts for "${label}"`);
-        
-        this.timerService.startNewTimer(minutes, label);
+        this.timerService.startCountdown(stepId, minutes, label);
       }
     }
   }

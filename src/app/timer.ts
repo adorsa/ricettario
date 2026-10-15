@@ -1,29 +1,31 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, output, Service } from '@angular/core';
 
 export interface ActiveTimer {
   id: string;
   label: string;
+  type: 'COUNTDOWN' | 'ON_HOLD';
   totalSeconds: number;
   timeRemaining: number;
   isRunning: boolean;
   intervalId: any;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class Timer {
+@Service()
+export class TimerService {
   private activeTimersSignal = signal<ActiveTimer[]>([]);
 
   activeTimers = computed(() => this.activeTimersSignal());
 
-  startNewTimer(minutes: number, label: string) {
-    const totalSeconds = minutes * 60;
-    const timerId = 'timer_' + Date.now();
+  onItemCompleted = output<{ stepId: string }>();
 
+  startCountdown(stepId: string, minutes: number, label: string) {
+    this.removeTimerOrHold(stepId);
+
+    const totalSeconds = minutes * 60;
     const newTimer: ActiveTimer = {
-      id: timerId,
+      id: stepId,
       label: label || 'Timer',
+      type: 'COUNTDOWN',
       totalSeconds: totalSeconds,
       timeRemaining: totalSeconds,
       isRunning: true,
@@ -31,20 +33,37 @@ export class Timer {
     };
 
     newTimer.intervalId = setInterval(() => {
-      this.tick(timerId);
+      this.tick(stepId);
     }, 1000);
 
     this.activeTimersSignal.update(timers => [...timers, newTimer]);
   }
 
-  private tick(timerId: string) {
+  putOnHold(stepId: string, label: string) {
+    this.removeTimerOrHold(stepId);
+
+    const newHoldItem: ActiveTimer = {
+      id: stepId,
+      label: label || 'On hold',
+      type: 'ON_HOLD',
+      totalSeconds: 0,
+      timeRemaining: 0,
+      isRunning: false,
+      intervalId: null
+    };
+
+    this.activeTimersSignal.update(timers => [...timers, newHoldItem]);
+  }
+
+  private tick(stepId: string) {
     this.activeTimersSignal.update(timers => 
       timers.map(t => {
-        if (t.id === timerId) {
+        if (t.id === stepId && t.type === 'COUNTDOWN') {
           if (t.timeRemaining <= 1) {
             clearInterval(t.intervalId);
             this.playAlarm();
-            setTimeout(() => this.removeTimer(timerId), 60000);
+            
+            this.onItemCompleted.emit({ stepId: t.id });
             return { ...t, timeRemaining: 0, isRunning: false };
           }
           return { ...t, timeRemaining: t.timeRemaining - 1 };
@@ -54,10 +73,15 @@ export class Timer {
     );
   }
 
-  pauseTimer(timerId: string) {
+  releaseHoldOrComplete(stepId: string) {
+    this.removeTimerOrHold(stepId);
+    this.onItemCompleted.emit({ stepId });
+  }
+
+  pauseTimer(stepId: string) {
     this.activeTimersSignal.update(timers => 
       timers.map(t => {
-        if (t.id === timerId && t.isRunning) {
+        if (t.id === stepId && t.type === 'COUNTDOWN' && t.isRunning) {
           clearInterval(t.intervalId);
           return { ...t, isRunning: false, intervalId: null };
         }
@@ -66,11 +90,11 @@ export class Timer {
     );
   }
 
-  resumeTimer(timerId: string) {
+  resumeTimer(stepId: string) {
     this.activeTimersSignal.update(timers => 
       timers.map(t => {
-        if (t.id === timerId && !t.isRunning) {
-          const intervalId = setInterval(() => this.tick(timerId), 1000);
+        if (t.id === stepId && t.type === 'COUNTDOWN' && !t.isRunning) {
+          const intervalId = setInterval(() => this.tick(stepId), 1000);
           return { ...t, isRunning: true, intervalId };
         }
         return t;
@@ -78,12 +102,18 @@ export class Timer {
     );
   }
 
-  removeTimer(timerId: string) {
-    const timer = this.activeTimersSignal().find(t => t.id === timerId);
-    if (timer && timer.intervalId) {
-      clearInterval(timer.intervalId);
+  removeTimerOrHold(stepId: string) {
+    const item = this.activeTimersSignal().find(t => t.id === stepId);
+    if (item && item.intervalId) {
+      clearInterval(item.intervalId);
     }
-    this.activeTimersSignal.update(timers => timers.filter(t => t.id !== timerId));
+    this.activeTimersSignal.update(timers => timers.filter(t => t.id !== stepId));
+  }
+
+  getTimeRemainingMinutes(stepId: string): number {
+    const item = this.activeTimersSignal().find(t => t.id === stepId);
+    if (!item || item.type !== 'COUNTDOWN') return -1;
+    return item.timeRemaining / 60;
   }
 
   formatTime(seconds: number): string {
@@ -93,7 +123,7 @@ export class Timer {
   }
 
   getProgress(timer: ActiveTimer): number {
-    if (timer.totalSeconds === 0) return 0;
+    if (timer.type === 'ON_HOLD' || timer.totalSeconds === 0) return 0;
     return ((timer.totalSeconds - timer.timeRemaining) / timer.totalSeconds) * 100;
   }
 

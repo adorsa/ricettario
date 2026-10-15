@@ -1,52 +1,86 @@
 @if(timerService.activeTimers().length > 0) {
-  <div class="fixed bottom-6 right-6 left-6 md:left-auto md:w-80 space-y-3 z-50 max-h-[70vh] overflow-y-auto p-2">
-    @for(timer of timerService.activeTimers(); track $index) {
-      <div class="bg-slate-950 text-white p-4 rounded-xl shadow-2xl border border-slate-800 font-sans transition-all duration-300">
-        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
-          <div 
-            class="bg-emerald-500 h-full transition-all duration-1000 ease-linear"
-            [style.width.%]="timerService.getProgress(timer)"
-          ></div>
-        </div>
-
-        <div class="flex justify-between items-center mb-2">
-          <div class="truncate pr-2">
-            <strong class="text-sm font-semibold text-emerald-400 block truncate">{{ timer.label }}</strong>
-          </div>
-          <div class="text-xl font-mono font-bold tracking-tight text-white bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-            {{ timerService.formatTime(timer.timeRemaining) }}
-          </div>
-        </div>
-
-        <!-- Controlli Interattivi sul singolo timer -->
-        <div class="flex gap-2 mt-3 pt-2 border-t border-slate-900">
-          @if(timer.isRunning) {
-            <button 
-              (click)="timerService.pauseTimer(timer.id)"
-              class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
+    <div class="fixed bottom-6 right-6 left-6 md:left-auto md:w-80 space-y-3 z-50 max-h-[70vh] overflow-y-auto p-2">
+        @for(item of timerService.activeTimers(); track $index) {
+            <div 
+            *ngFor="let item of timerService.activeTimers()"
+            [ngClass]="{
+                'bg-slate-950 border-slate-800': item.type === 'COUNTDOWN',
+                'bg-slate-900 border-emerald-900/50': item.type === 'ON_HOLD'
+            }"
+            class="text-white p-4 rounded-xl shadow-2xl border font-sans transition-all duration-300"
             >
-              ⏸️ Pause
-            </button>
-          }
-          @else {
-            <ng-template #resumeBtn>
-              <button 
-                (click)="timerService.resumeTimer(timer.id)"
-                class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
-              >
-                ▶️ Resume
-              </button>
-            </ng-template>
-          }
+                @if(item.type === 'COUNTDOWN') {
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
+                        <div 
+                            class="bg-emerald-500 h-full transition-all duration-1000 ease-linear"
+                            [style.width.%]="timerService.getProgress(item)"
+                        ></div>
+                    </div>
 
-          <button 
-            (click)="timerService.removeTimer(timer.id)"
-            class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
-          >
-            ✕ Cancel
-          </button>
-        </div>
-      </div>
-    }
-  </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="truncate pr-2">
+                            <strong class="text-sm font-semibold text-emerald-400 block truncate">{{ item.label }}</strong>
+                        </div>
+                        <div class="text-xl font-mono font-bold tracking-tight text-white bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                            {{ timerService.formatTime(item.timeRemaining) }}
+                        </div>
+                    </div>
+
+                    <!-- Timer controls -->
+                    <div class="flex gap-2 mt-3 pt-2 border-t border-slate-900">
+                        @if(item.isRunning) {
+                            <button 
+                                (click)="timerService.pauseTimer(item.id)"
+                                class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
+                            >
+                                <b>⏸️</b> Pause
+                            </button>
+                        }
+                        @else {
+                            <button 
+                            (click)="timerService.resumeTimer(item.id)"
+                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
+                            >
+                            <b>▶️</b> Resume
+                            </button>
+                        }
+
+                        <button 
+                            (click)="timerService.removeTimerOrHold(item.id)"
+                            class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                }
+
+                @if(item.type === 'ON_HOLD') {
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="truncate pr-2">
+                            <span class="text-xs text-amber-400 block font-medium uppercase tracking-wider flex items-center gap-1">
+                            ⏳ Waiting for step completion
+                            </span>
+                            <strong class="text-sm font-semibold text-slate-200 block truncate mt-0.5">{{ item.label }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex gap-2 mt-3 pt-2 border-t border-slate-800">
+                    <button 
+                        (click)="timerService.releaseHoldOrComplete(item.id)"
+                        class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-xs transition-colors shadow-md flex items-center justify-center gap-1"
+                    >
+                        ✅ Complete step
+                    </button>
+                    <button 
+                        (click)="timerService.removeTimerOrHold(item.id)"
+                        class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 }

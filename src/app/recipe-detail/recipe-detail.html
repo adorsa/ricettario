@@ -1,14 +1,19 @@
-@if(recipe()) {
+@if (recipe()) {
   <div class="max-w-2xl mx-auto p-4 font-sans text-gray-800">
-    <button (click)="goBack()" class="text-sm text-emerald-600 hover:underline mb-4 block">
-      ⬅️ Back to list
-    </button>
-    <button (click)="goToEdit()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded transition-colors">
-      ✏️ Edit
-    </button>
+    
+    <!-- Navigation bar -->
+    <div class="flex justify-between items-center mb-4">
+      <button (click)="goBack()" class="text-sm text-emerald-600 hover:underline">
+        ⬅️ Back to list
+      </button>
+      <button (click)="goToEdit()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded transition-colors">
+        ✏️ Edit
+      </button>
+    </div>
 
     <h1 class="text-3xl font-bold mb-4 text-emerald-700">{{ recipe()!.title }}</h1>
 
+    <!-- Servings calculation section -->
     <div class="bg-gray-100 p-4 rounded-lg mb-6 flex items-center gap-4">
       <label class="font-medium">Servings:</label>
       <input 
@@ -24,10 +29,11 @@
       </span>
     </div>
 
+    <!-- Ingredients list -->
     <div class="mb-6">
       <h2 class="text-xl font-semibold mb-2 border-b pb-1">Ingredients</h2>
       <ul class="list-disc pl-5 space-y-1">
-        @for(ing of objectValues(recipe()!.ingredients); track $index) {
+        @for (ing of objectValues(recipe()!.ingredients); track ing.key) {
           <li>
             <strong>{{ +(ing.value.qty * multiplier()).toFixed(2) }}{{ ing.value.unit }}</strong> 
             {{ ing.value.name }}
@@ -36,15 +42,17 @@
       </ul>
     </div>
 
+    <!-- Steps -->
     <div>
       <h2 class="text-xl font-semibold mb-2 border-b pb-1">Procedure</h2>
       <ol class="list-decimal pl-5 space-y-4">
-        @for(step of parsedSteps(); track $index) {
+        @for (step of parsedSteps(); track step.id; let i = $index) {
           <li>
-            <div [innerHTML]="step" (click)="handleStepClick($event)"></div>
+            <div [innerHTML]="step.html" (click)="handleStepClick($event, step.id, step.text)"></div>
           </li>
         }
       </ol>
     </div>
+
   </div>
 }
