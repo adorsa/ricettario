@@ -1,10 +1,10 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../supabase.service';
+import { Supabase } from '../supabase.service';
 import { Recipe } from '../recipe.model';
-import { RecipeParserService } from '../recipe-parser.service';
-import { TimerService } from '../timer.service';
+import { RecipeParser } from '../recipe-parser.service';
+import { Timer } from '../timer.service';
 
 @Component({
   selector: 'app-recipe-detail',

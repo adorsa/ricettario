@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SupabaseService } from '../supabase.service';
+import { Supabase } from '../supabase.service';
 import { IngredientsMap, RecipeStep } from '../recipe.model';
 
 interface EditableRecipeStep {

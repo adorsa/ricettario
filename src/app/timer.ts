@@ -11,7 +11,7 @@ export interface ActiveTimer {
 }
 
 @Service()
-export class TimerService {
+export class Timer {
   private activeTimersSignal = signal<ActiveTimer[]>([]);
 
   activeTimers = computed(() => this.activeTimersSignal());
