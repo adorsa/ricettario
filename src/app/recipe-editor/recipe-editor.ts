@@ -15,10 +15,10 @@ interface EditableRecipeStep {
   selector: 'app-recipe-editor',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './recipe-editor.component.html'
+  templateUrl: './recipe-editor.html'
 })
-export class RecipeEditorComponent implements OnInit {
-  private supabaseService = inject(SupabaseService);
+export class RecipeEditor implements OnInit {
+  private supabaseService = inject(Supabase);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 

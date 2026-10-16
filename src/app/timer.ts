@@ -16,7 +16,8 @@ export class Timer {
 
   activeTimers = computed(() => this.activeTimersSignal());
 
-  onItemCompleted = output<{ stepId: string }>();
+  private onItemCompletedSubject = Subject<{ stepId: string }>();
+  onItemCompleted = this.onItemCompletedSubject.asObservable();
 
   startCountdown(stepId: string, minutes: number, label: string) {
     this.removeTimerOrHold(stepId);
@@ -63,7 +64,7 @@ export class Timer {
             clearInterval(t.intervalId);
             this.playAlarm();
             
-            this.onItemCompleted.emit({ stepId: t.id });
+            this.onItemCompletedSubject.next({ stepId: t.id });
             return { ...t, timeRemaining: 0, isRunning: false };
           }
           return { ...t, timeRemaining: t.timeRemaining - 1 };
@@ -75,7 +76,7 @@ export class Timer {
 
   releaseHoldOrComplete(stepId: string) {
     this.removeTimerOrHold(stepId);
-    this.onItemCompleted.emit({ stepId });
+    this.onItemCompletedSubject.next({ stepId });
   }
 
   pauseTimer(stepId: string) {

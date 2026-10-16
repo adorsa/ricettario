@@ -1,24 +1,24 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Supabase } from '../supabase.service';
+import { Supabase } from '../supabase';
 import { Recipe } from '../recipe.model';
-import { RecipeParser } from '../recipe-parser.service';
-import { Timer } from '../timer.service';
+import { RecipeParser } from '../recipe-parser';
+import { Timer } from '../timer';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './recipe-detail.component.html',
-  styleUrls: ['./recipe-detail.component.css']
+  templateUrl: './recipe-detail.html',
+  styleUrls: ['./recipe-detail.css']
 })
-export class RecipeDetailComponent implements OnInit {
+export class RecipeDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private supabaseService = inject(SupabaseService);
-  private parserService = inject(RecipeParserService);
-  private timerService = inject(TimerService);
+  private supabaseService = inject(Supabase);
+  private parserService = inject(RecipeParser);
+  private timerService = inject(Timer);
 
   recipe = signal<Recipe | null>(null);
   baseServings = computed(() => this.recipe()?.servings_base ?? 4);

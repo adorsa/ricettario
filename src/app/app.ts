@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet, RouterLinkWithHref } from '@angular/router';
-import { RecipeListComponent } from './recipe-list/recipe-list';
+import { RecipeList } from './recipe-list/recipe-list';
 import { Supabase } from './supabase';
-import { TimerWidgetComponent } from './timer-widget/timer-widget';
+import { TimerWidget } from './timer-widget/timer-widget';
 
 @Component({
   imports: [RouterOutlet, TimerWidgetComponent, RouterLinkWithHref],

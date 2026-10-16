@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './auth.html',
-  styleUrl: './auth.css'
+  styleUrls: ['./auth.css']
 })
 export class Auth {
   private supabaseService = inject(Supabase);
