@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Supabase } from './../supabase';
 import { Router } from '@angular/router';
 import { Recipe } from '../recipe.model';
+import { I18n } from '../i18n/i18n';
 
 @Component({
   selector: 'app-recipe-list',
@@ -14,6 +15,7 @@ import { Recipe } from '../recipe.model';
 export class RecipeList implements OnInit {
   private supabaseService = inject(Supabase);
   private router = inject(Router);
+  public i18n = inject(I18n);
 
   recipesSignal = signal<any[]>([]);
   isLoading = signal(true);
@@ -47,16 +49,18 @@ export class RecipeList implements OnInit {
     }
   }
 
-  async deleteRecipe(event: MouseEvent, id: string) {
+  async deleteRecipe(event: MouseEvent, recipe: Recipe) {
     event.stopPropagation();
-    
-    if (confirm('Are you sure you want to delete this recipe?')) {
+
+    if (!this.isRecipeOwner(recipe)) return;
+
+    if (confirm(this.i18n.t('recipes.deleteConfirm'))) {
       try {
-        await this.supabaseService.deleteRecipe(id);
+        await this.supabaseService.deleteRecipe(recipe.id!);
         // Remove the deleted recipe from the local list.
-        this.recipesSignal.update(recipes => recipes.filter(r => r.id !== id));
+        this.recipesSignal.update(recipes => recipes.filter(r => r.id !== recipe.id));
       } catch (err) {
-        console.error('There was an error while deleting the recipe:', err);
+        console.error(this.i18n.t('recipes.deleteError'), err);
       }
     }
   }

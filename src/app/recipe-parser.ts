@@ -1,10 +1,12 @@
 import { inject, Service } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IngredientsMap } from './recipe.model';
+import { I18n } from './i18n/i18n';
 
 @Service()
 export class RecipeParser {
   private sanitizer = inject(DomSanitizer);
+  private i18n = inject(I18n);
   
   private readonly ingredientRegex = /\[i:([a-zA-Z0-9_]+)(?::([\d.]+))?\]/g;
   private readonly timerRegex = /\[t:(\d+):([^\]]+)\]/g;
@@ -15,12 +17,12 @@ export class RecipeParser {
     this.ingredientRegex.lastIndex = 0;
     parsedText = parsedText.replace(this.ingredientRegex, (match, ingId, quotaStr) => {
       const ingredient = ingredients[ingId];
-      if (!ingredient) return `<span class="text-red-500">[missing ingredient]</span>`;
+      if (!ingredient) return `<span class="text-red-500">${this.i18n.t('parser.missingIngredient')}</span>`;
       const quota = quotaStr ? parseFloat(quotaStr) : 1;
       const finalQty = ingredient.qty * multiplier * quota;
       const formattedQty = +finalQty.toFixed(2);
       
-      const qtyString = formattedQty > 0 ? `${formattedQty}${ingredient.unit} of ` : '';
+      const qtyString = formattedQty > 0 ? `${formattedQty}${ingredient.unit} ${this.i18n.t('parser.quantityOf')} ` : '';
       return `<strong class="ingredient-tag bg-amber-100 text-amber-900 px-1 rounded">${qtyString}${ingredient.name}</strong>`;
     });
 

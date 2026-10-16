@@ -3,11 +3,11 @@
   <!-- status bar -->
   <div class="flex justify-between items-center border-b pb-4">
     <div>
-      <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Working on</span>
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">{{ i18n.t('work.workingOn') }}</span>
       <h2 class="text-lg font-bold text-slate-800">{{ activeRecipe.recipe()?.title }}</h2>
     </div>
     <button (click)="exitWorkMode()" class="text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 px-3 rounded-lg font-medium transition-colors">
-      Exit
+      {{ i18n.t('work.exit') }}
     </button>
   </div>
 
@@ -16,7 +16,7 @@
     @if (currentStep()) {
       <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 w-full text-center space-y-6">
         <span class="inline-block bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wide">
-          Active step
+          {{ i18n.t('work.activeStep') }}
         </span>
         
         <p class="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed" 
@@ -30,10 +30,10 @@
       <div class="bg-gradient-to-br from-emerald-600 to-teal-700 p-8 rounded-2xl shadow-xl w-full text-center text-white space-y-6 animate-pulse">
         <div class="text-4xl">☕</div>
         <p class="text-emerald-100 text-lg leading-relaxed">
-          {{ idleMessage() }}
+          {{ i18n.t(idleMessageKey()) }}
         </p>
         <span class="inline-block bg-teal-800/40 border border-teal-500/30 text-xs px-3 py-1.5 rounded-full font-mono">
-          Active timers are visible in the panel below.
+          {{ i18n.t('work.timersVisible') }}
         </span>
       </div>
     }
@@ -41,12 +41,12 @@
     @else {
       <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 w-full text-center space-y-6">
         <div class="text-5xl">🎉</div>
-        <h3 class="text-3xl font-bold text-emerald-700">You're all set!</h3>
+        <h3 class="text-3xl font-bold text-emerald-700">{{ i18n.t('work.allSet') }}</h3>
         <p class="text-slate-600 text-lg">
-          Congratulations on completing another yummy recipe! Happy eating!
+          {{ i18n.t('work.congratulations') }}
         </p>
         <button (click)="exitWorkMode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg">
-          Back to recipe
+          {{ i18n.t('work.backToRecipe') }}
         </button>
       </div>
     }
@@ -58,11 +58,11 @@
     <div class="flex gap-4 border-t pt-4 bg-slate-50">
       
       <button (click)="putStepOnHold()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow">
-        ⏳ Put on hold
+        ⏳ {{ i18n.t('work.putOnHold') }}
       </button>
 
       <button (click)="completeStep()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition-colors shadow-lg flex items-center justify-center gap-2">
-        ✅ Complete step
+        ✅ {{ i18n.t('work.completeStep') }}
       </button>
       
     </div>

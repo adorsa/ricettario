@@ -5,6 +5,7 @@ import { ActiveRecipe } from '../active-recipe';
 import { RecipeParser } from '../recipe-parser';
 import { Timer } from '../timer';
 import { Supabase } from '../supabase';
+import { I18n } from '../i18n/i18n';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -20,6 +21,7 @@ export class RecipeDetail implements OnInit {
   private parserService = inject(RecipeParser);
   private timerService = inject(Timer);
   private supabaseService = inject(Supabase);
+  public i18n = inject(I18n);
 
   recipe = computed(() => this.activeRecipe.recipe());
   canEdit = computed(() => {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Supabase } from './../supabase';
 import { Router } from '@angular/router';
+import { I18n } from '../i18n/i18n';
 
 @Component({
   selector: 'app-auth',
@@ -14,14 +15,15 @@ import { Router } from '@angular/router';
 export class Auth {
   private supabaseService = inject(Supabase);
   private router = inject(Router);
+  public i18n = inject(I18n);
 
   email = '';
   password = '';
 
   isLoginMode = signal(true);
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
+  errorMessage = signal(false);
+  successMessage = signal<'auth.loginSuccess' | 'auth.signupSuccess' | null>(null);
 
   toggleMode() {
     this.isLoginMode.update(mode => !mode);
@@ -39,15 +41,15 @@ export class Auth {
     try {
       if (this.isLoginMode()) {
         await this.supabaseService.signIn(this.email, this.password);
-        this.successMessage.set('Successfully logged in!');
+        this.successMessage.set('auth.loginSuccess');
         this.router.navigate(['/']);
       } else {
         await this.supabaseService.signUp(this.email, this.password);
-        this.successMessage.set('Account created. Check your email.');
+        this.successMessage.set('auth.signupSuccess');
         this.password = '';
       }
     } catch (error: any) {
-      this.errorMessage.set(error.message || 'Authentication error');
+      this.errorMessage.set(true);
     } finally {
       this.isLoading.set(false);
     }

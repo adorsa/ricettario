@@ -5,6 +5,7 @@ import { RecipeParser } from './../recipe-parser';
 import { Timer } from './../timer';
 import { ActiveRecipe } from './../active-recipe';
 import { RecipeStep } from './../recipe.model';
+import { I18n } from './../i18n/i18n';
 
 @Component({
   selector: 'app-recipe-work-mode',
@@ -19,16 +20,11 @@ export class RecipeWorkMode implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public activeRecipe = inject(ActiveRecipe);
+  public i18n = inject(I18n);
 
-  // Random messages for idle time
-  private pausePhrases = [
-    'Time for a small break! Timers will let you know when it\'s time to get back to work.',
-    'All done for now! You might clean up the kitchen while you wait. 😊',
-    'Good job! Now take a deep breath and relax until the timers call you back.',
-    'Take a break while yeast, fire, oven or whatever else work their magic.'
-  ];
+  private pausePhraseKeys = ['work.pause0', 'work.pause1', 'work.pause2', 'work.pause3'] as const;
 
-  idleMessage = signal(this.pausePhrases[0]);
+  idleMessageKey = signal<(typeof this.pausePhraseKeys)[number]>(this.pausePhraseKeys[0]);
 
   currentStep = computed<RecipeStep | null>(() => {
     const step = this.workflow.currentWorkflowStep();
@@ -104,8 +100,8 @@ export class RecipeWorkMode implements OnInit {
   }
 
   rotateIdleMessage() {
-    const randomIndex = Math.floor(Math.random() * this.pausePhrases.length);
-    this.idleMessage.set(this.pausePhrases[randomIndex]);
+    const randomIndex = Math.floor(Math.random() * this.pausePhraseKeys.length);
+    this.idleMessageKey.set(this.pausePhraseKeys[randomIndex]);
   }
 
   exitWorkMode() {

@@ -20,6 +20,7 @@ describe('ActiveRecipe', () => {
       id: 'recipe-1',
       title: 'Pasta',
       servings_base: 4,
+      is_public: false,
       ingredients: {},
       steps: []
     };

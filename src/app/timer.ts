@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, output, Service } from '@angular/core';
 import { Subject } from 'rxjs';
+import { I18n } from './i18n/i18n';
 
 export interface ActiveTimer {
   id: string;
@@ -13,6 +14,7 @@ export interface ActiveTimer {
 
 @Service()
 export class Timer {
+  private i18n = inject(I18n);
   private activeTimersSignal = signal<ActiveTimer[]>([]);
 
   activeTimers = computed(() => this.activeTimersSignal());
@@ -26,7 +28,7 @@ export class Timer {
     const totalSeconds = minutes * 60;
     const newTimer: ActiveTimer = {
       id: stepId,
-      label: label || 'Timer',
+      label: label || this.i18n.t('timer.defaultLabel'),
       type: 'COUNTDOWN',
       totalSeconds: totalSeconds,
       timeRemaining: totalSeconds,
@@ -46,7 +48,7 @@ export class Timer {
 
     const newHoldItem: ActiveTimer = {
       id: stepId,
-      label: label || 'On hold',
+      label: label || this.i18n.t('timer.onHold'),
       type: 'ON_HOLD',
       totalSeconds: 0,
       timeRemaining: 0,

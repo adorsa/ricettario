@@ -1,21 +1,21 @@
 <div class="max-w-md mx-auto mt-12 p-6 bg-white rounded-lg shadow-md font-sans text-gray-800 border border-gray-200">
     <h2 class="text-2xl font-bold mb-6 text-center text-emerald-700">
-    {{ isLoginMode() ? 'Log into your recipe book' : 'Create a new account' }}
+    {{ i18n.t(isLoginMode() ? 'auth.loginTitle' : 'auth.signupTitle') }}
     </h2>
     @if(errorMessage()) {
         <div class="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm">
-        {{ errorMessage() }}
+        {{ i18n.t('auth.error') }}
         </div>
     }
     @if(successMessage()) {
         <div class="mb-4 p-3 bg-green-100 text-green-700 rounded text-sm">
-        {{ successMessage() }}
+        {{ i18n.t(successMessage()!) }}
         </div>
     }
 
     <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="space-y-4">
     <div>
-        <label class="block text-sm font-medium mb-1">Email</label>
+        <label class="block text-sm font-medium mb-1">{{ i18n.t('auth.email') }}</label>
         <input 
         type="email" 
         [(ngModel)]="email" 
@@ -28,7 +28,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-medium mb-1">Password</label>
+        <label class="block text-sm font-medium mb-1">{{ i18n.t('auth.password') }}</label>
         <input 
         type="password" 
         [(ngModel)]="password" 
@@ -45,7 +45,7 @@
         [disabled]="authForm.invalid || isLoading()"
         class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded transition-colors disabled:opacity-50"
     >
-        {{ isLoading() ? 'Please wait...' : (isLoginMode() ? 'Log in' : 'Sign up') }}
+        {{ isLoading() ? i18n.t('auth.pleaseWait') : (isLoginMode() ? i18n.t('auth.login') : i18n.t('auth.signup')) }}
     </button>
     </form>
 
@@ -55,7 +55,7 @@
         (click)="toggleMode()" 
         class="text-emerald-600 hover:underline focus:outline-none"
     >
-        {{ isLoginMode() ? "You don't have an account? Register" : "You already have an account? Log in" }}
+        {{ i18n.t(isLoginMode() ? 'auth.noAccount' : 'auth.hasAccount') }}
     </button>
     </div>
 </div>

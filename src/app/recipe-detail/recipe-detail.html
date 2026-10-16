@@ -4,18 +4,18 @@
     <!-- Navigation bar -->
     <div class="flex justify-between items-center mb-4">
       <button (click)="goBack()" class="text-sm text-emerald-600 hover:underline">
-        ⬅️ Back to list
+        ⬅️ {{ i18n.t('detail.back') }}
       </button>
       @if (canEdit()) {
         <button (click)="goToEdit()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded transition-colors">
-          ✏️ Edit
+          ✏️ {{ i18n.t('detail.edit') }}
         </button>
       }
     </div>
 
     <h1 class="text-3xl font-bold mb-4 text-emerald-700">{{ recipe()!.title }}</h1>
     @if (recipe()!.is_public) {
-      <p class="text-sm text-emerald-700 mb-4">Public recipe</p>
+      <p class="text-sm text-emerald-700 mb-4">{{ i18n.t('detail.public') }}</p>
     }
 
     <div class="mb-6">
@@ -23,13 +23,13 @@
         (click)="startWorkMode()" 
         class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 text-lg"
       >
-        👨‍🍳 Enter immersive work mode
+        👨‍🍳 {{ i18n.t('detail.startWorkMode') }}
       </button>
     </div>
 
     <!-- Servings calculation section -->
     <div class="bg-gray-100 p-4 rounded-lg mb-6 flex items-center gap-4">
-      <label class="font-medium">Servings:</label>
+      <label class="font-medium">{{ i18n.t('detail.servings') }}</label>
       <input 
         type="number" 
         [ngModel]="currentServings()" 
@@ -37,7 +37,7 @@
         min="1" 
         class="w-20 p-1 border rounded text-center text-lg font-bold"
       />
-      <span class="text-sm text-gray-500">(Base: {{ baseServings() }})</span>
+      <span class="text-sm text-gray-500">{{ i18n.t('detail.base', { count: baseServings() }) }}</span>
       <span class="text-sm bg-emerald-100 text-emerald-800 px-2 py-1 rounded font-mono">
         x{{ multiplier().toFixed(2) }}
       </span>
@@ -45,7 +45,7 @@
 
     <!-- Ingredients list -->
     <div class="mb-6">
-      <h2 class="text-xl font-semibold mb-2 border-b pb-1">Ingredients</h2>
+      <h2 class="text-xl font-semibold mb-2 border-b pb-1">{{ i18n.t('detail.ingredients') }}</h2>
       <ul class="list-disc pl-5 space-y-1">
         @for (ing of objectValues(recipe()!.ingredients); track ing.key) {
           <li>
@@ -58,7 +58,7 @@
 
     <!-- Steps -->
     <div>
-      <h2 class="text-xl font-semibold mb-2 border-b pb-1">Procedure</h2>
+      <h2 class="text-xl font-semibold mb-2 border-b pb-1">{{ i18n.t('detail.procedure') }}</h2>
       <ol class="list-decimal pl-5 space-y-4">
         @for (step of parsedSteps(); track step.id; let i = $index) {
           <li>

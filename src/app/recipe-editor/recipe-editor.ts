@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Supabase } from '../supabase';
 import { IngredientsMap, RecipeStep } from '../recipe.model';
+import { I18n } from '../i18n/i18n';
 
 interface EditableRecipeStep {
   id: string;
@@ -21,6 +22,7 @@ export class RecipeEditor implements OnInit {
   private supabaseService = inject(Supabase);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  public i18n = inject(I18n);
 
   isEditMode = signal<boolean>(false);
   recipeId: string | null = null;
@@ -152,7 +154,7 @@ export class RecipeEditor implements OnInit {
       }
     } catch (err) {
       console.error('Error during save:', err);
-      alert('There was an error saving this recipe.');
+      alert(this.i18n.t('editor.saveError'));
     } finally {
       this.isLoading.set(false);
     }
@@ -164,7 +166,7 @@ export class RecipeEditor implements OnInit {
 
   exportToJSON() {
     if (!this.title) {
-      alert("Exporting requires the recipe title to be set. Type a recipe title and try again.");
+      alert(this.i18n.t('editor.exportNeedsTitle'));
       return;
     }
 
@@ -209,7 +211,7 @@ export class RecipeEditor implements OnInit {
         const importedRecipe = JSON.parse(jsonText);
 
         if (!importedRecipe.title || !importedRecipe.ingredients || !importedRecipe.steps) {
-          alert("The imported JSON file is not in a valid format for this application.");
+          alert(this.i18n.t('editor.invalidImport'));
           return;
         }
 
@@ -224,10 +226,10 @@ export class RecipeEditor implements OnInit {
           tempDependencies: step.dependencies ? step.dependencies.join(', ') : ''
         }));
 
-        alert("Still not saved! The recipe imported correctly, check the data on this form and click 'Save' to keep it in your recipe book.");
+        alert(this.i18n.t('editor.importSuccess'));
       } catch (err) {
         console.error("Error reading the file:", err);
-        alert("Error reading the file. Please ensure it is a valid JSON file in the correct format.");
+        alert(this.i18n.t('editor.readError'));
       }
     };
 

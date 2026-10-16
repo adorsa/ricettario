@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Timer } from '../timer';
 import { ActiveTimer } from '../timer';
+import { I18n } from '../i18n/i18n';
 
 @Component({
   selector: 'app-timer-widget',
@@ -11,6 +12,7 @@ import { ActiveTimer } from '../timer';
 })
 export class TimerWidget {
   public timerService = inject(Timer);
+  public i18n = inject(I18n);
 
   activeTooltipId = signal<string | null>(null);
 
