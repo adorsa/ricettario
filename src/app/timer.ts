@@ -17,7 +17,7 @@ export class Timer {
 
   activeTimers = computed(() => this.activeTimersSignal());
 
-  private onItemCompletedSubject = Subject<{ stepId: string }>();
+  private onItemCompletedSubject = new Subject<{ stepId: string }>();
   onItemCompleted = this.onItemCompletedSubject.asObservable();
 
   startCountdown(stepId: string, minutes: number, label: string) {

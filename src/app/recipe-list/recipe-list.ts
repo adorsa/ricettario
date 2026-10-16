@@ -11,7 +11,7 @@ import { Recipe } from '../recipe.model';
   templateUrl: './recipe-list.html',
   styleUrl: './recipe-list.css'
 })
-export class RecipeListComponent implements OnInit {
+export class RecipeList implements OnInit {
   private supabaseService = inject(Supabase);
   private router = inject(Router);
 
