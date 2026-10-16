@@ -1,10 +1,10 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RecipeWorkflow } from './recipe-workflow';
-import { RecipeParser } from './recipe-parser';
-import { Timer } from './timer';
-import { Supabase } from './supabase';
-import { RecipeStep } from './recipe.model';
+import { RecipeWorkflow } from './../recipe-workflow';
+import { RecipeParser } from './../recipe-parser';
+import { Timer } from './../timer';
+import { Supabase } from './../supabase';
+import { RecipeStep } from './../recipe.model';
 
 @Component({
   selector: 'app-recipe-work-mode',
