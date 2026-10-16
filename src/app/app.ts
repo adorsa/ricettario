@@ -1,25 +1,24 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router, RouterOutlet, RouterLinkWithHref } from '@angular/router';
-import { RecipeList } from './recipe-list/recipe-list';
-import { Supabase } from './supabase';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, RouterLink } from '@angular/router';
 import { TimerWidget } from './timer-widget/timer-widget';
+import { Timer } from './timer';
+import { Supabase } from './supabase';
 
 @Component({
-  imports: [RouterOutlet, TimerWidget, RouterLinkWithHref],
   selector: 'app-root',
-  styleUrl: './app.css',
-  templateUrl: './app.html',
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, TimerWidget],
+  templateUrl: './app.html'
 })
 export class App {
-  private supabaseService = inject(Supabase);
-  private router = inject(Router);
-  protected readonly title = signal('ricettario');
+  public timerService = inject(Timer);
+  public supabaseService = inject(Supabase); 
 
-  newRecipe() {
-    this.router.navigate(['/recipes/new']);
-  }
-
-  logout() {
-    this.supabaseService.signOut();
+  async logout() {
+    try {
+      await this.supabaseService.signOut();
+    } catch (err) {
+      console.error('Error during logout:', err);
+    }
   }
 }

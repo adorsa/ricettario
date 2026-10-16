@@ -1,86 +1,90 @@
-@if(timerService.activeTimers().length > 0) {
-    <div class="fixed bottom-6 right-6 left-6 md:left-auto md:w-80 space-y-3 z-50 max-h-[70vh] overflow-y-auto p-2">
-        @for(item of timerService.activeTimers(); track $index) {
-            <div 
-            *ngFor="let item of timerService.activeTimers()"
-            [ngClass]="{
-                'bg-slate-950 border-slate-800': item.type === 'COUNTDOWN',
-                'bg-slate-900 border-emerald-900/50': item.type === 'ON_HOLD'
-            }"
-            class="text-white p-4 rounded-xl shadow-2xl border font-sans transition-all duration-300"
-            >
-                @if(item.type === 'COUNTDOWN') {
-                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
-                        <div 
-                            class="bg-emerald-500 h-full transition-all duration-1000 ease-linear"
-                            [style.width.%]="timerService.getProgress(item)"
-                        ></div>
-                    </div>
+@if (timerService.activeTimers().length > 0) {
+  <div class="fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 text-white h-16 px-4 flex items-center justify-between z-50 font-sans shadow-2xl">
+    
+    <div class="flex items-center gap-4 overflow-x-auto py-1 scrollbar-none flex-1">
+      @for (item of timerService.activeTimers(); track item.id) {
+        <div 
+          class="relative flex items-center justify-center w-11 h-11 rounded-full cursor-pointer hover:bg-slate-900 transition-colors group"
+          (click)="toggleTooltip(item.id)"
+        >
+          
+          @if (item.type === 'COUNTDOWN') {
+            <svg class="w-10 h-10 transform -rotate-90">
+              <!-- Cerchio di sfondo -->
+              <circle cx="20" cy="20" r="16" stroke="#1e293b" stroke-width="3" fill="transparent" />
+              <!-- Cerchio di progresso dinamico -->
+              <circle 
+                cx="20" cy="20" r="16" 
+                stroke="#10b981" stroke-width="3" fill="transparent"
+                [attr.stroke-dasharray]="100.53"
+                [attr.stroke-dashoffset]="calculateDashOffset(item)"
+                stroke-linecap="round"
+                class="transition-all duration-1000 ease-linear"
+              />
+            </svg>
+            <span class="absolute text-[10px] font-mono font-bold">
+              {{ getMinutesLeftStr(item) }}'
+            </span>
+          }
 
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="truncate pr-2">
-                            <strong class="text-sm font-semibold text-emerald-400 block truncate">{{ item.label }}</strong>
-                        </div>
-                        <div class="text-xl font-mono font-bold tracking-tight text-white bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                            {{ timerService.formatTime(item.timeRemaining) }}
-                        </div>
-                    </div>
-
-                    <!-- Timer controls -->
-                    <div class="flex gap-2 mt-3 pt-2 border-t border-slate-900">
-                        @if(item.isRunning) {
-                            <button 
-                                (click)="timerService.pauseTimer(item.id)"
-                                class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
-                            >
-                                <b>⏸️</b> Pause
-                            </button>
-                        }
-                        @else {
-                            <button 
-                            (click)="timerService.resumeTimer(item.id)"
-                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
-                            >
-                            <b>▶️</b> Resume
-                            </button>
-                        }
-
-                        <button 
-                            (click)="timerService.removeTimerOrHold(item.id)"
-                            class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                }
-
-                @if(item.type === 'ON_HOLD') {
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="truncate pr-2">
-                            <span class="text-xs text-amber-400 block font-medium uppercase tracking-wider flex items-center gap-1">
-                            ⏳ Waiting for step completion
-                            </span>
-                            <strong class="text-sm font-semibold text-slate-200 block truncate mt-0.5">{{ item.label }}</strong>
-                        </div>
-                    </div>
-
-                    <!-- Controls -->
-                    <div class="flex gap-2 mt-3 pt-2 border-t border-slate-800">
-                    <button 
-                        (click)="timerService.releaseHoldOrComplete(item.id)"
-                        class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-xs transition-colors shadow-md flex items-center justify-center gap-1"
-                    >
-                        ✅ Complete step
-                    </button>
-                    <button 
-                        (click)="timerService.removeTimerOrHold(item.id)"
-                        class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-medium py-1 px-2 rounded-lg text-xs transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    </div>
-                }
+          @if (item.type === 'ON_HOLD') {
+            <div class="w-9 h-9 rounded-full bg-slate-800 border border-amber-500/40 flex items-center justify-center text-sm shadow-inner animate-pulse">
+              ⏳
             </div>
-        }
+          }
+
+          @if (activeTooltipId() === item.id) {
+            <div class="absolute bottom-14 left-1/2 transform -translate-x-1/2 w-56 bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-2xl z-50 space-y-2 text-left animate-fadeIn">
+              <div class="flex justify-between items-start gap-1">
+                <strong class="text-xs font-semibold text-slate-200 block truncate flex-1">{{ item.label }}</strong>
+                <button (click)="toggleTooltip(item.id); $event.stopPropagation()" class="text-slate-500 hover:text-slate-300 text-xs">✕</button>
+              </div>
+
+              <div class="flex justify-between items-center bg-slate-950 px-2 py-1 rounded border border-slate-850 font-mono text-sm">
+                <span class="text-slate-400 text-xs uppercase">{{ item.type }}</span>
+                <span class="font-bold text-emerald-400">
+                  @if (item.type === 'COUNTDOWN') { {{ timerService.formatTime(item.timeRemaining) }} } @else { Aperto }
+                </span>
+              </div>
+
+              <div class="flex gap-1.5 pt-1.5 border-t border-slate-800 text-[11px]">
+                @if (item.type === 'COUNTDOWN') {
+                  <button 
+                    (click)="item.isRunning ? timerService.pauseTimer(item.id) : timerService.resumeTimer(item.id); $event.stopPropagation()"
+                    class="flex-1 text-center py-1 px-1.5 rounded font-medium transition-colors"
+                    [ngClass]="item.isRunning ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'"
+                  >
+                    {{ item.isRunning ? 'Pause' : 'Resume' }}
+                  </button>
+                } @else {
+                  <button 
+                    (click)="timerService.releaseHoldOrComplete(item.id); toggleTooltip(item.id); $event.stopPropagation()"
+                    class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1 px-1.5 rounded text-center shadow"
+                  >
+                    ✓ Complete
+                  </button>
+                }
+                <button 
+                  (click)="timerService.removeTimerOrHold(item.id); toggleTooltip(item.id); $event.stopPropagation()"
+                  class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-1 px-1.5 rounded transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
     </div>
+
+    <!-- Indicatore sintetico sul lato destro della barra -->
+    <div class="text-right hidden sm:block pl-4 border-l border-slate-800">
+      <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Ongoing</span>
+      <span class="text-xs font-mono font-bold bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-emerald-400">
+        {{ timerService.activeTimers().length }} steps
+      </span>
+    </div>
+
+  </div>
 }
