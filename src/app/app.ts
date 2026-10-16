@@ -5,7 +5,7 @@ import { Supabase } from './supabase';
 import { TimerWidget } from './timer-widget/timer-widget';
 
 @Component({
-  imports: [RouterOutlet, TimerWidgetComponent, RouterLinkWithHref],
+  imports: [RouterOutlet, TimerWidget, RouterLinkWithHref],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Supabase } from '../supabase.service';
+import { Supabase } from '../supabase';
 import { IngredientsMap, RecipeStep } from '../recipe.model';
 
 interface EditableRecipeStep {
@@ -51,7 +51,7 @@ export class RecipeEditor implements OnInit {
           this.servingsBase = recipe.servings_base;
           this.ingredients = recipe.ingredients;
           
-          this.steps = recipe.steps.map(step => ({
+          this.steps = recipe.steps.map((step: RecipeStep) => ({
             id: step.id,
             text: step.text,
             tempDependencies: step.dependencies ? step.dependencies.join(', ') : ''

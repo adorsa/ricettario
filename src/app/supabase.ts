@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, Service } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../environments/environment.development';
-import { Recipe } from 'recipe.model';
+import { Recipe } from './recipe.model';
 
 @Service()
 export class Supabase {

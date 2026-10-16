@@ -9,6 +9,6 @@ import { Timer } from '../timer';
   templateUrl: './timer-widget.html',
   styleUrl: './timer-widget.css'
 })
-export class TimerWidgetComponent {
+export class TimerWidget {
   public timerService = inject(Timer);
 }
