@@ -19,6 +19,7 @@ export interface Recipe {
   user_id?: string;
   title: string;
   servings_base: number;
+  is_public: boolean;
   ingredients: IngredientsMap;
   steps: RecipeStep[];
   created_at?: string;

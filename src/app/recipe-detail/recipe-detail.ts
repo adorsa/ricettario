@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActiveRecipe } from '../active-recipe';
 import { RecipeParser } from '../recipe-parser';
 import { Timer } from '../timer';
+import { Supabase } from '../supabase';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -18,8 +19,14 @@ export class RecipeDetail implements OnInit {
   private activeRecipe = inject(ActiveRecipe);
   private parserService = inject(RecipeParser);
   private timerService = inject(Timer);
+  private supabaseService = inject(Supabase);
 
   recipe = computed(() => this.activeRecipe.recipe());
+  canEdit = computed(() => {
+    const recipe = this.recipe();
+    const user = this.supabaseService.currentUser();
+    return !!user && recipe?.user_id === user.id;
+  });
   baseServings = computed(() => this.recipe()?.servings_base ?? 4);
   currentServings = computed(() => this.activeRecipe.servings());
   multiplier = this.activeRecipe.multiplier;

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, output } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Supabase } from './../supabase';
 import { Router } from '@angular/router';
@@ -28,6 +28,11 @@ export class RecipeList implements OnInit {
 
   onSelectRecipe(recipe: Recipe) {
   this.router.navigate(['/recipes', recipe.id]);
+  }
+
+  isRecipeOwner(recipe: Recipe) {
+    const user = this.supabaseService.currentUser();
+    return !!user && recipe.user_id === user.id;
   }
 
   async loadRecipes() {

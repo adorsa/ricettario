@@ -28,6 +28,7 @@ export class RecipeEditor implements OnInit {
 
   title = '';
   servingsBase = 4;
+  isPublic = false;
   ingredients: IngredientsMap = {};
   
   steps: EditableRecipeStep[] = [{ id: '', text: '', tempDependencies: '' }];
@@ -47,8 +48,14 @@ export class RecipeEditor implements OnInit {
       try {
         const recipe = await this.supabaseService.getRecipeById(this.recipeId);
         if (recipe) {
+          if (recipe.user_id !== this.supabaseService.currentUser()?.id) {
+            this.router.navigate(['/recipes', recipe.id]);
+            return;
+          }
+
           this.title = recipe.title;
           this.servingsBase = recipe.servings_base;
+          this.isPublic = recipe.is_public ?? false;
           this.ingredients = recipe.ingredients;
           
           this.steps = recipe.steps.map((step: RecipeStep) => ({
@@ -131,6 +138,7 @@ export class RecipeEditor implements OnInit {
       const recipeData = {
         title: this.title,
         servings_base: this.servingsBase,
+        is_public: this.isPublic,
         ingredients: this.ingredients,
         steps: cleanSteps
       };
@@ -171,6 +179,7 @@ export class RecipeEditor implements OnInit {
     const recipeData = {
       title: this.title,
       servings_base: this.servingsBase,
+      is_public: this.isPublic,
       ingredients: this.ingredients,
       steps: cleanSteps
     };
@@ -206,6 +215,7 @@ export class RecipeEditor implements OnInit {
 
         this.title = importedRecipe.title;
         this.servingsBase = importedRecipe.servings_base || 4;
+        this.isPublic = importedRecipe.is_public === true;
         this.ingredients = importedRecipe.ingredients;
         
         this.steps = importedRecipe.steps.map((step: any) => ({
