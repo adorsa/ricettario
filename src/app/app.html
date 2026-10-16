@@ -1,14 +1,20 @@
-<main [class.pb-16]="timerService.activeTimers().length > 0" class="min-h-screen transition-all duration-350 ease-out">
-    @if(supabaseService.isAuthenticated()) {
-        <div class="max-w-2xl mx-auto px-4 mb-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-            <span class="text-xs text-gray-500 font-medium">🧑‍🍳 {{ supabaseService.currentUser()?.email }}</span>
-            <button (click)="logout()" class="text-xs text-red-500 hover:text-red-700 font-semibold">Logout</button>
-        </div>
-    }
-    @else {
-        <a class="max-w-2xl mx-auto px-4 mb-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100" [routerLink]="'/auth'">Log in / Sign up</a>
-    }
+<div 
+    [class.has-timers]="timerService.activeTimers().length > 0" 
+    class="app-container min-h-screen bg-slate-50 flex flex-col justify-between transition-all duration-300"
+>
+    <main class="main-content flex-1 relative">
+        @if(supabaseService.isAuthenticated()) {
+            <div class="max-w-2xl mx-auto px-4 mb-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 mt-4">
+                <span class="text-xs text-gray-500 font-medium">🧑‍🍳 {{ supabaseService.currentUser()?.email }}</span>
+                <button (click)="logout()" class="text-xs text-red-500 hover:text-red-700 font-semibold">Logout</button>
+            </div>
+        }
+        @else {
+            <a class="max-w-2xl mx-auto px-4 mb-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 mt-4" [routerLink]="'/auth'">Log in / Sign up</a>
+        }
 
-    <router-outlet></router-outlet>
-    <app-timer-widget></app-timer-widget>
-</main>
+        <router-outlet></router-outlet>
+    </main>
+
+  <app-timer-widget></app-timer-widget>
+</div>
