@@ -25,7 +25,7 @@ export class Supabase {
           this.currentUserSignal.set(parsed.user);
         }
       } catch (e) {
-        console.error("Errore nel parsing della sessione locale:", e);
+        console.error('Error parsing the local session:', e);
       }
     }
 
@@ -62,7 +62,7 @@ export class Supabase {
 
   async createRecipe(recipe: Omit<Recipe, 'id' | 'user_id' | 'created_at'>) {
     const user = this.currentUserSignal();
-    if (!user) throw new Error('Utente non autenticato');
+    if (!user) throw new Error('User is not authenticated');
 
     const { data, error } = await this.supabase
       .from('recipes')
@@ -75,7 +75,7 @@ export class Supabase {
 
   async getRecipes(): Promise<Recipe[]> {
     const user = this.currentUserSignal();
-    if (!user) throw new Error('Utente non autenticato');
+    if (!user) throw new Error('User is not authenticated');
 
     const { data, error } = await this.supabase
       .from('recipes')

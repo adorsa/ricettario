@@ -178,7 +178,7 @@ export class RecipeEditor implements OnInit {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(recipeData, null, 2));
     const downloadAnchor = document.createElement('a');
     
-    const fileName = `ricetta-${this.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.json`;
+    const fileName = `recipe-${this.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.json`;
     
     downloadAnchor.setAttribute("href", dataStr);
     downloadAnchor.setAttribute("download", fileName);

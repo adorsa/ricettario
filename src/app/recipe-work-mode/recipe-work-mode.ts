@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { RecipeWorkflow } from './../recipe-workflow';
 import { RecipeParser } from './../recipe-parser';
 import { Timer } from './../timer';
-import { Supabase } from './../supabase';
+import { ActiveRecipe } from './../active-recipe';
 import { RecipeStep } from './../recipe.model';
 
 @Component({
@@ -18,7 +18,7 @@ export class RecipeWorkMode implements OnInit {
   private timer = inject(Timer);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private supabase = inject(Supabase);
+  public activeRecipe = inject(ActiveRecipe);
 
   // Random messages for idle time
   private pausePhrases = [
@@ -37,22 +37,22 @@ export class RecipeWorkMode implements OnInit {
 
   parsedStepHtml = computed(() => {
     const step = this.currentStep();
-    const recipe = this.workflow.activeRecipe();
+    const recipe = this.activeRecipe.recipe();
     if (!step || !recipe) return '';
-    return this.parser.parseStepText(step.text, recipe.ingredients, 1);
+    return this.parser.parseStepText(step.text, recipe.ingredients, this.activeRecipe.multiplier());
   });
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       try {
-        const recipeData = await this.supabase.getRecipeById(id);
+        const recipeData = await this.activeRecipe.loadRecipe(id);
         if (recipeData) {
-          this.workflow.initWorkflow(recipeData);
+          this.workflow.initWorkflow();
           this.rotateIdleMessage();
         }
       } catch (err) {
-        console.error('Impossibile caricare il flusso della ricetta:', err);
+        console.error('Unable to load the recipe workflow:', err);
         this.router.navigate(['/recipes']);
       }
     }
@@ -109,7 +109,7 @@ export class RecipeWorkMode implements OnInit {
   }
 
   exitWorkMode() {
-    const recipe = this.workflow.activeRecipe();
+    const recipe = this.activeRecipe.recipe();
     if (recipe && recipe.id) {
       this.router.navigate(['/recipes', recipe.id]);
     } else {

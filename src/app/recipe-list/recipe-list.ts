@@ -48,7 +48,7 @@ export class RecipeList implements OnInit {
     if (confirm('Are you sure you want to delete this recipe?')) {
       try {
         await this.supabaseService.deleteRecipe(id);
-        // Aggiorna la lista locale rimuovendo l'elemento eliminato
+        // Remove the deleted recipe from the local list.
         this.recipesSignal.update(recipes => recipes.filter(r => r.id !== id));
       } catch (err) {
         console.error('There was an error while deleting the recipe:', err);

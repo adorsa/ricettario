@@ -1,16 +1,17 @@
 import { Service, inject, signal, computed } from '@angular/core';
-import { Recipe, RecipeStep, StepWorkflowStatus } from './recipe.model';
+import { RecipeStep, StepWorkflowStatus } from './recipe.model';
 import { Timer } from './timer';
+import { ActiveRecipe } from './active-recipe';
 
 @Service()
 export class RecipeWorkflow {
   private timer = inject(Timer);
+  private activeRecipe = inject(ActiveRecipe);
 
-  activeRecipe = signal<Recipe | null>(null);
   completedStepIds = signal<string[]>([]);
   
   stepStatuses = computed(() => {
-    const recipe = this.activeRecipe();
+    const recipe = this.activeRecipe.recipe();
     if (!recipe) return {};
 
     const completed = this.completedStepIds();
@@ -37,7 +38,7 @@ export class RecipeWorkflow {
   });
 
   availableSteps = computed(() => {
-    const recipe = this.activeRecipe();
+    const recipe = this.activeRecipe.recipe();
     if (!recipe) return [];
     const statuses = this.stepStatuses();
     return recipe.steps.filter(step => statuses[step.id] === 'READY');
@@ -49,7 +50,7 @@ export class RecipeWorkflow {
   });
 
   isIdleTime = computed(() => {
-    const recipe = this.activeRecipe();
+    const recipe = this.activeRecipe.recipe();
     if (!recipe) return false;
 
     const statuses = this.stepStatuses();
@@ -67,8 +68,7 @@ export class RecipeWorkflow {
     });
   }
 
-  initWorkflow(recipe: Recipe) {
-    this.activeRecipe.set(recipe);
+  initWorkflow() {
     this.completedStepIds.set([]);
   }
 

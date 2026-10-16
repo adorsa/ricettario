@@ -1,8 +1,7 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Supabase } from '../supabase';
-import { Recipe } from '../recipe.model';
+import { ActiveRecipe } from '../active-recipe';
 import { RecipeParser } from '../recipe-parser';
 import { Timer } from '../timer';
 
@@ -16,14 +15,14 @@ import { Timer } from '../timer';
 export class RecipeDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private supabaseService = inject(Supabase);
+  private activeRecipe = inject(ActiveRecipe);
   private parserService = inject(RecipeParser);
   private timerService = inject(Timer);
 
-  recipe = signal<Recipe | null>(null);
+  recipe = computed(() => this.activeRecipe.recipe());
   baseServings = computed(() => this.recipe()?.servings_base ?? 4);
-  currentServings = signal(4);
-  multiplier = computed(() => this.currentServings() / this.baseServings());
+  currentServings = computed(() => this.activeRecipe.servings());
+  multiplier = this.activeRecipe.multiplier;
 
   parsedSteps = computed(() => {
     const currentRecipe = this.recipe();
@@ -39,11 +38,7 @@ export class RecipeDetail implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       try {
-        const data = await this.supabaseService.getRecipeById(id);
-        if (data) {
-          this.recipe.set(data as Recipe);
-          this.currentServings.set(data.servings_base);
-        }
+        await this.activeRecipe.loadRecipe(id);
       } catch (err) {
         console.error('Error loading recipe:', err);
         this.router.navigate(['/recipes']);
@@ -53,7 +48,7 @@ export class RecipeDetail implements OnInit {
 
   updateServings(value: number) {
     if (value && value > 0) {
-      this.currentServings.set(value);
+      this.activeRecipe.setServings(value);
     }
   }
 

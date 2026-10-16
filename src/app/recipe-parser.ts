@@ -20,7 +20,7 @@ export class RecipeParser {
       const finalQty = ingredient.qty * multiplier * quota;
       const formattedQty = +finalQty.toFixed(2);
       
-      const qtyString = formattedQty > 0 ? `${formattedQty}${ingredient.unit} di ` : '';
+      const qtyString = formattedQty > 0 ? `${formattedQty}${ingredient.unit} of ` : '';
       return `<strong class="ingredient-tag bg-amber-100 text-amber-900 px-1 rounded">${qtyString}${ingredient.name}</strong>`;
     });
 
