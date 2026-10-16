@@ -1,0 +1,7 @@
+.timer-popup {
+    position: fixed;
+    bottom: 64px;
+    left: 0;
+    right: 0;
+    max-width: 400px;
+}
