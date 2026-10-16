@@ -90,4 +90,11 @@ export class RecipeDetail implements OnInit {
   objectValues(obj: any) {
     return Object.keys(obj).map(key => ({ key, value: obj[key] }));
   }
+
+  startWorkMode() {
+    const currentRecipe = this.recipe();
+    if (currentRecipe && currentRecipe.id) {
+      this.router.navigate(['/recipes', currentRecipe.id, 'work']);
+  }
+}
 }

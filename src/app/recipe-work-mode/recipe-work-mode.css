@@ -1,0 +1,20 @@
+:host ::ng-deep .ingredient-tag {
+    font-weight: 600;
+}
+:host ::ng-deep .timer-btn {
+    cursor: pointer !important;
+    display: inline-flex;
+    align-items: center;
+    background-color: #2563eb !important;
+    color: white !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    font-weight: 500;
+    border: none;
+    margin: 0 4px;
+}
+:host ::ng-deep .timer-btn:hover {
+    background-color: #1d4ed8 !important;
+}
+
+ 

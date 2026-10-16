@@ -13,6 +13,15 @@
 
     <h1 class="text-3xl font-bold mb-4 text-emerald-700">{{ recipe()!.title }}</h1>
 
+    <div class="mb-6">
+      <button 
+        (click)="startWorkMode()" 
+        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 text-lg"
+      >
+        👨‍🍳 Enter immersive work mode
+      </button>
+    </div>
+
     <!-- Servings calculation section -->
     <div class="bg-gray-100 p-4 rounded-lg mb-6 flex items-center gap-4">
       <label class="font-medium">Servings:</label>
