@@ -153,4 +153,74 @@ export class RecipeEditor implements OnInit {
   objectKeys(obj: any) { 
     return Object.keys(obj); 
   }
+
+  exportToJSON() {
+    if (!this.title) {
+      alert("Exporting requires the recipe title to be set. Type a recipe title and try again.");
+      return;
+    }
+
+    const cleanSteps = this.steps
+      .filter(s => s.id.trim() !== '' && s.text.trim() !== '')
+      .map(s => ({
+        id: s.id.trim(),
+        text: s.text,
+        dependencies: s.tempDependencies ? s.tempDependencies.split(',').map(d => d.trim()).filter(d => d !== '') : []
+      }));
+
+    const recipeData = {
+      title: this.title,
+      servings_base: this.servingsBase,
+      ingredients: this.ingredients,
+      steps: cleanSteps
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(recipeData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    
+    const fileName = `ricetta-${this.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.json`;
+    
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", fileName);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  }
+
+  onFileImported(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const jsonText = e.target?.result as string;
+        const importedRecipe = JSON.parse(jsonText);
+
+        if (!importedRecipe.title || !importedRecipe.ingredients || !importedRecipe.steps) {
+          alert("The imported JSON file is not in a valid format for this application.");
+          return;
+        }
+
+        this.title = importedRecipe.title;
+        this.servingsBase = importedRecipe.servings_base || 4;
+        this.ingredients = importedRecipe.ingredients;
+        
+        this.steps = importedRecipe.steps.map((step: any) => ({
+          id: step.id,
+          text: step.text,
+          tempDependencies: step.dependencies ? step.dependencies.join(', ') : ''
+        }));
+
+        alert("Still not saved! The recipe imported correctly, check the data on this form and click 'Save' to keep it in your recipe book.");
+      } catch (err) {
+        console.error("Error reading the file:", err);
+        alert("Error reading the file. Please ensure it is a valid JSON file in the correct format.");
+      }
+    };
+
+    reader.readAsText(file);
+  }
 }

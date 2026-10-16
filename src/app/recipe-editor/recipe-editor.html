@@ -3,9 +3,19 @@
     <h2 class="text-2xl font-bold text-emerald-700">
       @if (isEditMode()) { Edit recipe } @else { New recipe }
     </h2>
+    <button type="button" (click)="exportToJSON()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 py-1.5 px-3 rounded border font-medium">
+      📥 Export to file
+    </button>
+
+    <label class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 py-1.5 px-3 rounded border border-emerald-200 font-medium cursor-pointer">
+      📤 Import from file
+      <input type="file" accept=".json" class="hidden" (change)="onFileImported($event)" />
+    </label>
     <button type="button" (click)="cancel()" class="text-sm text-gray-500 hover:text-gray-700 font-medium">
       Cancel
     </button>
+  </div>
+</div>
   </div>
 
   <form (ngSubmit)="saveRecipe()" #recipeForm="ngForm" class="space-y-6">
