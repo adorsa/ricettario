@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, output, Service } from '@angular/core';
+import { Injectable, signal, computed, output, Service, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { I18n } from './i18n/i18n';
 

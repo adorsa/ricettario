@@ -27,7 +27,7 @@ export class Auth {
 
   toggleMode() {
     this.isLoginMode.update(mode => !mode);
-    this.errorMessage.set(null);
+    this.errorMessage.set(false);
     this.successMessage.set(null);
   }
 
@@ -35,7 +35,7 @@ export class Auth {
     if (!this.email || !this.password) return;
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.errorMessage.set(false);
     this.successMessage.set(null);
 
     try {
