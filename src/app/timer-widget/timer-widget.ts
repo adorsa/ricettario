@@ -28,4 +28,10 @@ export class TimerWidget {
     const mins = Math.ceil(item.timeRemaining / 60);
     return mins.toString();
   }
+
+  getActiveTimerItem(): ActiveTimer | null {
+    const activeId = this.activeTooltipId();
+    if (!activeId) return null;
+    return this.timerService.activeTimers().find(t => t.id === activeId) || null;
+}
 }
