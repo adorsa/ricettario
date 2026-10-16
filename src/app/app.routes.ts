@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { RecipeList } from './recipe-list/recipe-list';
 import { RecipeDetail } from './recipe-detail/recipe-detail';
 import { RecipeEditor } from './recipe-editor/recipe-editor';
-import { RecipeWorkMode } from './recipe-work-mode';
+import { RecipeWorkMode } from './recipe-work-mode/recipe-work-mode';
 import { Auth } from './auth/auth';
 
 export const routes: Routes = [

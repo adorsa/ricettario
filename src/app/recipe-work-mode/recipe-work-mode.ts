@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/router';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RecipeWorkflow } from './recipe-workflow';
 import { RecipeParser } from './recipe-parser';
