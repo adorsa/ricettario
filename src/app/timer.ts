@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, output, Service, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { I18n } from './i18n/i18n';
+import { StepTimer } from './timer.model';
 
 export interface ActiveTimer {
   id: string;
@@ -22,13 +23,13 @@ export class Timer {
   private onItemCompletedSubject = new Subject<{ stepId: string }>();
   onItemCompleted = this.onItemCompletedSubject.asObservable();
 
-  startCountdown(stepId: string, minutes: number, label: string) {
+  startCountdown(stepId: string, stepTimer: StepTimer) {
     this.removeTimerOrHold(stepId);
 
-    const totalSeconds = minutes * 60;
+    const totalSeconds = stepTimer.minutes * 60;
     const newTimer: ActiveTimer = {
       id: stepId,
-      label: label || this.i18n.t('timer.defaultLabel'),
+      label: stepTimer.label || this.i18n.t('timer.defaultLabel'),
       type: 'COUNTDOWN',
       totalSeconds: totalSeconds,
       timeRemaining: totalSeconds,

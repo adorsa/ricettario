@@ -86,7 +86,7 @@ export class RecipeDetail implements OnInit {
 
       if (minutesStr) {
         const minutes = parseInt(minutesStr, 10);
-        this.timerService.startCountdown(stepId, minutes, label);
+        this.timerService.startCountdown(stepId, {minutes: minutes, label: label});
       }
     }
   }

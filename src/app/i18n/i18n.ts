@@ -81,6 +81,8 @@ const english = {
   'work.pause3': 'Take a break while the yeast, stove, oven, or something else works its magic.',
   'timer.status': 'Status',
   'timer.running': 'Running',
+  'timer.start': 'Start timer',
+  'timer.startAll': 'Start all timers',
   'timer.pause': 'Pause',
   'timer.resume': 'Resume',
   'timer.complete': 'Complete',
@@ -176,6 +178,8 @@ const italian: Record<TranslationKey, string> = {
   'work.pause3': 'Fai una pausa mentre il lievito, i fornelli, il forno o qualcos’altro fanno la loro magia.',
   'timer.status': 'Stato',
   'timer.running': 'In corso',
+  'timer.start': 'Avvia timer',
+  'timer.startAll': 'Avvia tutti i timer',
   'timer.pause': 'Pausa',
   'timer.resume': 'Riprendi',
   'timer.complete': 'Completa',
@@ -188,15 +192,111 @@ const italian: Record<TranslationKey, string> = {
   'parser.quantityOf': 'di'
 };
 
-export type Language = 'en' | 'it';
+const japanese: Record<TranslationKey, string> = {
+  'app.title': 'レシピ帳',
+  'app.logout': 'ログアウト',
+  'app.loginAndSignup': 'ログイン / 新規登録',
+  'language.label': '言語',
+  'auth.loginTitle': 'レシピ帳にログイン',
+  'auth.signupTitle': 'アカウントを作成',
+  'auth.email': 'メールアドレス',
+  'auth.password': 'パスワード',
+  'auth.pleaseWait': '少々お待ちください...',
+  'auth.login': 'ログイン',
+  'auth.signup': 'アカウント作成',
+  'auth.noAccount': 'アカウントをお持ちでないですか？ 新規登録',
+  'auth.hasAccount': '既にアカウントをお持ちですか？ ログイン',
+  'auth.loginSuccess': 'ログインに成功しました！',
+  'auth.signupSuccess': 'アカウントが作成されました。メールを確認してください。',
+  'auth.error': '認証に失敗しました。入力内容を確認して再度お試しください。',
+  'recipes.title': 'レシピ一覧',
+  'recipes.new': '新しいレシピをつくる',
+  'recipes.loading': 'レシピを読み込み中...',
+  'recipes.empty': 'レシピがまだありません。上の「新しいレシピをつくる」から始めましょう。',
+  'recipes.baseServings': '基本の分量: {{count}}人前',
+  'recipes.delete': 'レシピを削除',
+  'recipes.deleteConfirm': 'このレシピを本当に削除しますか？',
+  'recipes.deleteError': 'レシピの削除中にエラーが発生しました。',
+  'detail.back': '一覧に戻る',
+  'detail.edit': '編集',
+  'detail.public': '公開レシピ',
+  'detail.startWorkMode': '調理モード（グラフ実行）を開始',
+  'detail.servings': '分量変更:',
+  'detail.base': '(基本: {{count}}人前)',
+  'detail.ingredients': '材料一覧',
+  'detail.procedure': '手順・プロセス',
+  'editor.editTitle': 'レシピの編集',
+  'editor.newTitle': '新しいレシピ',
+  'editor.export': 'JSONエクスポート',
+  'editor.import': 'JSONインポート',
+  'editor.cancel': 'キャンセル',
+  'editor.recipeTitle': 'レシピ名',
+  'editor.titlePlaceholder': '例：トマトとバジルのパスタ',
+  'editor.baseServings': '基本の分量（人前）',
+  'editor.publicDescription': 'このレシピを他の認証ユーザーに公開します（編集できるのはあなただけです）。',
+  'editor.ingredients': '材料',
+  'editor.ingredientName': '材料名',
+  'editor.quantity': '数値 (例: 200)',
+  'editor.unit': '単位 (例: g, ml)',
+  'editor.addIngredient': '材料を追加',
+  'editor.remove': '削除',
+  'editor.procedureSteps': '調理手順（グラフノード）',
+  'editor.stepNumber': '手順 n. {{number}}',
+  'editor.delete': '削除',
+  'editor.stepId': '手順ID (一意の識別子)',
+  'editor.stepIdPlaceholder': '例: sauce_prep',
+  'editor.dependencies': '前提手順・依存関係（カンマ区切り）',
+  'editor.dependenciesPlaceholder': '例: id_passaggio_precedente, cooking:rem<=10',
+  'editor.instructions': '指示内容説明文',
+  'editor.instructionsPlaceholder': '手順の説明を入力してください。タイマーを設定するには [t:15:ラベル]、材料を参照するには [i:ing_id] を使用します。',
+  'editor.addStep': '手順を追加',
+  'editor.saving': '保存中...',
+  'editor.update': '更新する',
+  'editor.save': '保存する',
+  'editor.saveError': 'レシピの保存中にエラーが発生しました。',
+  'editor.exportNeedsTitle': 'エクスポートする前にレシピ名を入力してください。',
+  'editor.invalidImport': 'インポートされたJSONファイルは、このアプリの有効な形式ではありません。',
+  'editor.importSuccess': 'レシピがインポートされました（まだ保存されていません）。内容を確認し、「保存する」をクリックして追加してください。',
+  'editor.readError': 'ファイルの読み込みエラー。正しい形式の有効なJSONファイルであることを確認してください。',
+  'work.workingOn': '調理中のレシピ',
+  'work.exit': '終了',
+  'work.activeStep': '実行中の手順',
+  'work.timersVisible': 'アクティブなタイマーは下のパネルに表示されます。',
+  'work.allSet': 'すべての工程が完了しました！',
+  'work.congratulations': 'お疲れ様でした！レシピが完成しました。美味しく召し上がれ！',
+  'work.backToRecipe': 'レシピ詳細に戻る',
+  'work.putOnHold': '保留（非同期待機）',
+  'work.completeStep': '手順を完了',
+  'work.pause0': '少し休憩しましょう！時間が来たらタイマーがお知らせします。',
+  'work.pause1': '今の作業はここまでです！待っている間にキッチンを片付けましょう。',
+  'work.pause2': '素晴らしい手際です！深呼吸して、タイマーが鳴るまでリラックスしてください。',
+  'work.pause3': 'イーストの発酵、コンロ、オーブンなどが魔法をかけている間、一休みしましょう。',
+  'timer.status': '状態',
+  'timer.running': '進行中',
+  'timer.start': 'タイマースタート',
+  'timer.startAll': 'タイマーすべてスタート',
+  'timer.pause': '一時停止',
+  'timer.resume': '再開',
+  'timer.complete': '完了',
+  'timer.remove': '削除',
+  'timer.ongoing': '進行中のプロセス',
+  'timer.actions': '件のタスク',
+  'timer.defaultLabel': 'タイマー',
+  'timer.onHold': '保留中（ウェイト）',
+  'parser.missingIngredient': '[材料が見つかりません]',
+  'parser.quantityOf': 'の'
+};
+
+export type Language = 'en' | 'it' | 'ja';
 
 @Service()
 export class I18n {
   readonly languages: ReadonlyArray<{ code: Language; label: string }> = [
     { code: 'en', label: 'English' },
-    { code: 'it', label: 'Italiano' }
+    { code: 'it', label: 'Italiano' },
+    { code: 'ja', label: '日本語' }
   ];
-  readonly language = signal<Language>(this.readSavedLanguage());
+  readonly language = signal(this.readSavedLanguage());
 
   constructor() {
     this.updateDocumentLanguage(this.language());
@@ -213,18 +313,21 @@ export class I18n {
   }
 
   t(key: TranslationKey, params: Record<string, string | number> = {}): string {
-    const template = this.language() === 'it' ? italian[key] : english[key];
-    return template.replace(/\{\{(\w+)\}\}/g, (_, name: string) => String(params[name] ?? ''));
+    const lang = this.language();
+    const template = lang === 'ja' ? japanese[key] : lang === 'it' ? italian[key] : english[key];
+    return template.replace(/{{(\w+)}}/g, (_, name: string) => String(params[name] ?? ''));
   }
 
   private readSavedLanguage(): Language {
     try {
-      return localStorage.getItem('ricettario-language') === 'it' ? 'it' : 'en';
+      const saved = localStorage.getItem('ricettario-language');
+      if (saved === 'ja') return 'ja';
+      if (saved === 'it') return 'it';
+      return 'en';
     } catch {
       return 'en';
     }
   }
-
   private updateDocumentLanguage(language: Language) {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = language;

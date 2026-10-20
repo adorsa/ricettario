@@ -46,7 +46,7 @@ ng test
 
 ## Localization
 
-The app currently supports English (`en`) and Italian (`it`) with live language switching. Translations are defined in `src/app/i18n/i18n.ts`. To add a language, add its code to the `Language` type, provide a complete catalog matching the English keys, add its display name to `languages`, and update the catalog lookup in `t()`.
+Translations are defined in `src/app/i18n/i18n.ts`. To add a language, add its code to the `Language` type, provide a complete catalog matching the English keys, add its display name to `languages`, and update the catalog lookup in `t()`.
 
 ## Running end-to-end tests
 

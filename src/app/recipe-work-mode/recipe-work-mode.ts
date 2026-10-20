@@ -6,6 +6,7 @@ import { Timer } from './../timer';
 import { ActiveRecipe } from './../active-recipe';
 import { RecipeStep } from './../recipe.model';
 import { I18n } from './../i18n/i18n';
+import { StepTimer } from '../timer.model';
 
 @Component({
   selector: 'app-recipe-work-mode',
@@ -29,6 +30,23 @@ export class RecipeWorkMode implements OnInit {
   currentStep = computed<RecipeStep | null>(() => {
     const step = this.workflow.currentWorkflowStep();
     return step ? step : null;
+  });
+
+  currentStepHasTimer = computed<boolean>(() => {
+    const step = this.currentStep();
+    if(!step) return false;
+    return /\[t:(\d+):([^\]]+)\]/.test(step!.text);
+  });
+
+  currentStepTimers = computed<StepTimer[] | undefined>(() => {
+    const step = this.currentStep();
+    if(!step) return;
+    const timerRegexMultiple = /\[t:(\d+):([^\]]+)\]/g;
+
+    return [...step.text.matchAll(timerRegexMultiple)]
+      .map((match) => { 
+        return { minutes: parseInt(match[1], 10), label: match[2].trim() } as StepTimer; 
+      });
   });
 
   parsedStepHtml = computed(() => {
@@ -65,7 +83,7 @@ export class RecipeWorkMode implements OnInit {
       const minutes = parseInt(match[1], 10);
       const label = match[2].trim();
       
-      this.timer.startCountdown(step.id, minutes, label);
+      this.timer.startCountdown(step.id, {minutes: minutes, label: label});
       this.rotateIdleMessage();
     } else {
       this.workflow.markStepAsCompleted(step.id);
@@ -93,10 +111,17 @@ export class RecipeWorkMode implements OnInit {
 
       if (minutesStr) {
         const minutes = parseInt(minutesStr, 10);
-        this.timer.startCountdown(step.id, minutes, label);
+        this.timer.startCountdown(step.id, {minutes: minutes, label: label});
         this.rotateIdleMessage();
       }
     }
+  }
+
+  startAllTimers() {
+    if(!this.currentStepTimers()) return;
+    this.currentStepTimers()!.forEach(timer => {
+      if(this.currentStep()) this.timer.startCountdown(this.currentStep()!.id, timer);
+    });
   }
 
   rotateIdleMessage() {
