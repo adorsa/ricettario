@@ -50,7 +50,7 @@
         @for (ing of objectValues(recipe()!.ingredients); track ing.key) {
           <li>
             <strong>{{ +(ing.value.qty * multiplier()).toFixed(2) }}{{ ing.value.unit }}</strong> 
-            {{ ing.value.name }}
+            {{ ing.value.name }} ({{ ing.value.description }})
           </li>
         }
       </ul>
