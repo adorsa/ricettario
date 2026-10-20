@@ -1,5 +1,6 @@
 @if (timerService.activeTimers().length > 0) {
   @if (getActiveTimerItem(); as activeItem) {
+    <!-- Timer details tooltip -->
     <div 
       class="fixed bottom-20 left-0 right-0 w-full px-4 flex justify-center z-50 pointer-events-none"
       (click)="$event.stopPropagation()"
@@ -26,14 +27,13 @@
             >
               {{ activeItem.isRunning ? i18n.t('timer.pause') : i18n.t('timer.resume') }}
             </button>
-          } @else {
-            <button 
-              (click)="timerService.releaseHoldOrComplete(activeItem.id); activeTooltipId.set(null); $event.stopPropagation()"
-              class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-lg text-center shadow"
-            >
-              ✓ {{ i18n.t('timer.complete') }}
-            </button>
           }
+          <button 
+            (click)="timerService.releaseHoldOrComplete(activeItem.id); activeTooltipId.set(null); $event.stopPropagation()"
+            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-lg text-center shadow"
+          >
+            ✓ {{ i18n.t('timer.complete') }}
+          </button>
           <button 
             (click)="timerService.removeTimerOrHold(activeItem.id); activeTooltipId.set(null); $event.stopPropagation()"
             class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-3 rounded-lg transition-colors font-medium"
