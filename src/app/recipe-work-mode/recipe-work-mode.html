@@ -1,4 +1,4 @@
-<div class="work-mode-screen bg-slate-50 font-sans flex flex-col justify-between p-6">
+<div class="work-mode-screen bg-slate-50 font-sans flex flex-col justify-between px-6 pt-6 pb-0">
   
   <!-- status bar -->
   <div class="flex justify-between items-center border-b pb-4">
@@ -12,7 +12,7 @@
   </div>
 
   <!-- main content -->
-  <div class="flex-1 flex flex-col justify-center items-center my-6 max-w-xl mx-auto w-full">
+  <div class="work-mode-content flex-1 flex flex-col justify-center items-center my-6 max-w-xl mx-auto w-full">
     @if (currentStep()) {
       <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 w-full text-center space-y-6">
         <span class="inline-block bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wide">
@@ -55,7 +55,7 @@
 
   <!-- Current step actions bar -->
   @if (currentStep()) {
-    <div class="flex gap-4 border-t pt-4 bg-slate-50">
+    <div class="work-mode-actions flex gap-4 border-t pt-4 bg-slate-50">
       
       <button (click)="putStepOnHold()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow">
         ⏳ {{ i18n.t('work.putOnHold') }}

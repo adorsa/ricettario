@@ -1,6 +1,18 @@
 :host ::ng-deep .ingredient-tag {
     font-weight: 600;
 }
+.work-mode-content {
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 6rem;
+}
+.work-mode-actions {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem 1.5rem;
+}
 :host ::ng-deep .timer-btn {
     cursor: pointer !important;
     display: inline-flex;
