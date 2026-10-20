@@ -1,27 +1,41 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Supabase } from './../supabase';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Recipe } from '../recipe.model';
 import { I18n } from '../i18n/i18n';
 
 @Component({
   selector: 'app-recipe-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './recipe-list.html',
   styleUrl: './recipe-list.css'
 })
-export class RecipeList implements OnInit {
+export class RecipeList {
   private supabaseService = inject(Supabase);
   private router = inject(Router);
   public i18n = inject(I18n);
 
+  isAuthenticated = this.supabaseService.isAuthenticated;
   recipesSignal = signal<any[]>([]);
   isLoading = signal(true);
+  private recipeLoadRequestId = 0;
 
-  ngOnInit() {
-    this.loadRecipes();
+  constructor() {
+    effect(() => {
+      const authenticated = this.isAuthenticated();
+      const requestId = ++this.recipeLoadRequestId;
+
+      if (!authenticated) {
+        this.recipesSignal.set([]);
+        this.isLoading.set(false);
+        return;
+      }
+
+      this.recipesSignal.set([]);
+      void this.loadRecipes(requestId);
+    });
   }
 
   onCreateNew() {
@@ -37,15 +51,21 @@ export class RecipeList implements OnInit {
     return !!user && recipe.user_id === user.id;
   }
 
-  async loadRecipes() {
+  async loadRecipes(requestId = ++this.recipeLoadRequestId) {
     this.isLoading.set(true);
     try {
       const data = await this.supabaseService.getRecipes();
-      this.recipesSignal.set(data || []);
+      if (requestId === this.recipeLoadRequestId && this.isAuthenticated()) {
+        this.recipesSignal.set(data || []);
+      }
     } catch (err) {
-      console.error('Error loading recipes:', err);
+      if (requestId === this.recipeLoadRequestId) {
+        console.error('Error loading recipes:', err);
+      }
     } finally {
-      this.isLoading.set(false);
+      if (requestId === this.recipeLoadRequestId) {
+        this.isLoading.set(false);
+      }
     }
   }
 
