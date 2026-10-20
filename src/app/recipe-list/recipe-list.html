@@ -1,23 +1,34 @@
 <div class="max-w-2xl mx-auto p-4 font-sans text-gray-800">
     <div class="flex justify-between items-center mb-6 border-b pb-2">
     <h2 class="text-2xl font-bold text-emerald-700">{{ i18n.t('recipes.title') }}</h2>
-    <button 
-        (click)="onCreateNew()" 
-        class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-4 rounded text-sm transition-colors"
-    >
-        ➕ {{ i18n.t('recipes.new') }}
-    </button>
+    @if (isAuthenticated()) {
+        <button 
+            (click)="onCreateNew()" 
+            class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-4 rounded text-sm transition-colors"
+        >
+            ➕ {{ i18n.t('recipes.new') }}
+        </button>
+    }
     </div>
 
     @if(isLoading()) {<div class="text-center py-4 text-gray-500">{{ i18n.t('recipes.loading') }}</div>}
+
+    @if(!isLoading() && !isAuthenticated()) {
+        <div class="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
+            <p class="mb-4">{{ i18n.t('recipes.loginRequired') }}</p>
+            <a routerLink="/auth" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+                {{ i18n.t('app.loginAndSignup') }}
+            </a>
+        </div>
+    }
     
-    @if(!isLoading() && recipesSignal().length === 0) {
+    @if(!isLoading() && isAuthenticated() && recipesSignal().length === 0) {
         <div class="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
         {{ i18n.t('recipes.empty') }}
         </div>
     }
 
-    @if(!isLoading() && recipesSignal().length > 0) {
+    @if(!isLoading() && isAuthenticated() && recipesSignal().length > 0) {
         <div class="space-y-3">
         @for(recipe of recipesSignal(); track $index) {
             <div 

@@ -23,7 +23,12 @@ export class RecipeParser {
       const formattedQty = +finalQty.toFixed(2);
       
       const qtyString = formattedQty > 0 ? `${formattedQty}${ingredient.unit} ${this.i18n.t('parser.quantityOf')} ` : '';
-      return `<strong class="ingredient-tag bg-amber-100 text-amber-900 px-1 rounded">${qtyString}${ingredient.name}</strong>`;
+      const description = ingredient.description?.trim();
+      const note = description
+        ? `<span class="ingredient-note-indicator" tabindex="0" aria-label="${this.escapeHtml(this.i18n.t('parser.ingredientNoteAvailable'))}: ${this.escapeHtml(description)}">?</span><span class="ingredient-note-tooltip" role="tooltip">${this.escapeHtml(description)}</span>`
+        : '';
+      const noteClass = description ? ' ingredient-tag-with-note' : '';
+      return `<strong class="ingredient-tag bg-amber-100 text-amber-900 px-1 rounded${noteClass}">${qtyString}${ingredient.name}${note}</strong>`;
     });
 
     this.timerRegex.lastIndex = 0;
@@ -34,5 +39,15 @@ export class RecipeParser {
     });
 
     return this.sanitizer.bypassSecurityTrustHtml(parsedText);
+  }
+
+  private escapeHtml(value: string): string {
+    return value.replace(/[&<>"']/g, character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[character]!);
   }
 }

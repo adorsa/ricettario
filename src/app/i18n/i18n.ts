@@ -21,6 +21,7 @@ const english = {
   'recipes.new': 'New recipe',
   'recipes.loading': 'Loading recipe list...',
   'recipes.empty': 'There are no recipes yet. Click "New recipe" above to get started.',
+  'recipes.loginRequired': 'Log in or sign up to view your recipe book.',
   'recipes.baseServings': 'Base servings: {{count}}',
   'recipes.delete': 'Delete recipe',
   'recipes.deleteConfirm': 'Are you sure you want to delete this recipe?',
@@ -43,6 +44,8 @@ const english = {
   'editor.baseServings': 'Base servings',
   'editor.publicDescription': 'Make this recipe public to authenticated users. Only you can edit it.',
   'editor.ingredients': 'Ingredients',
+  'editor.ingredientDescription': 'Ingredient notes (optional)',
+  'editor.ingredientDescriptionPlaceholder': 'e.g. Toast the spices before adding.',
   'editor.ingredientName': 'Ingredient name',
   'editor.quantity': 'Qty (e.g. 200)',
   'editor.unit': 'Unit (e.g. g, ml)',
@@ -92,6 +95,7 @@ const english = {
   'timer.defaultLabel': 'Timer',
   'timer.onHold': 'On hold',
   'parser.missingIngredient': '[missing ingredient]',
+  'parser.ingredientNoteAvailable': 'Ingredient note',
   'parser.quantityOf': 'of'
 } as const;
 
@@ -118,6 +122,7 @@ const italian: Record<TranslationKey, string> = {
   'recipes.new': 'Nuova ricetta',
   'recipes.loading': 'Caricamento delle ricette...',
   'recipes.empty': 'Non ci sono ancora ricette. Seleziona "Nuova ricetta" per iniziare.',
+  'recipes.loginRequired': 'Accedi o registrati per visualizzare il tuo ricettario.',
   'recipes.baseServings': 'Porzioni base: {{count}}',
   'recipes.delete': 'Elimina ricetta',
   'recipes.deleteConfirm': 'Vuoi davvero eliminare questa ricetta?',
@@ -140,6 +145,8 @@ const italian: Record<TranslationKey, string> = {
   'editor.baseServings': 'Porzioni base',
   'editor.publicDescription': 'Rendi pubblica la ricetta per gli utenti autenticati. Solo tu puoi modificarla.',
   'editor.ingredients': 'Ingredienti',
+  'editor.ingredientDescription': 'Note ingrediente (opzionali)',
+  'editor.ingredientDescriptionPlaceholder': 'es. Tostare le spezie prima di aggiungerle.',
   'editor.ingredientName': 'Nome ingrediente',
   'editor.quantity': 'Quantità (es. 200)',
   'editor.unit': 'Unità (es. g, ml)',
@@ -189,6 +196,7 @@ const italian: Record<TranslationKey, string> = {
   'timer.defaultLabel': 'Timer',
   'timer.onHold': 'In attesa',
   'parser.missingIngredient': '[ingrediente mancante]',
+  'parser.ingredientNoteAvailable': 'Nota ingrediente',
   'parser.quantityOf': 'di'
 };
 
