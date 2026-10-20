@@ -38,6 +38,7 @@ export class RecipeEditor implements OnInit {
   newIngName = '';
   newIngQty: number | null = null;
   newIngUnit = '';
+  newIngDescription = '';
 
   private ingredientCounter = 1;
 
@@ -66,11 +67,7 @@ export class RecipeEditor implements OnInit {
             tempDependencies: step.dependencies ? step.dependencies.join(', ') : ''
           }));
 
-          const keys = Object.keys(recipe.ingredients);
-          if (keys.length > 0) {
-            const maxId = Math.max(...keys.map(k => parseInt(k.replace('ing_', ''), 10)));
-            this.ingredientCounter = maxId + 1;
-          }
+          this.updateIngredientCounter();
         }
       } catch (err) {
         console.error('Error loading recipe:', err);
@@ -84,20 +81,41 @@ export class RecipeEditor implements OnInit {
   addIngredient() {
     if (!this.newIngName || this.newIngQty === null) return;
 
-    const id = `ing_${this.ingredientCounter++}`;
+    const id = this.nextIngredientId();
     this.ingredients[id] = {
       name: this.newIngName,
       qty: this.newIngQty,
-      unit: this.newIngUnit || ''
+      unit: this.newIngUnit || '',
+      ...(this.newIngDescription.trim() ? { description: this.newIngDescription.trim() } : {})
     };
 
     this.newIngName = '';
     this.newIngQty = null;
     this.newIngUnit = '';
+    this.newIngDescription = '';
   }
 
   removeIngredient(key: string) {
     delete this.ingredients[key];
+  }
+
+  private updateIngredientCounter() {
+    const numericIds = Object.keys(this.ingredients).flatMap(key => {
+      const match = /^ing_(\d+)$/.exec(key);
+      if (!match) return [];
+
+      const numericId = Number(match[1]);
+      return Number.isSafeInteger(numericId) ? [numericId] : [];
+    });
+    this.ingredientCounter = Math.max(0, ...numericIds) + 1;
+  }
+
+  private nextIngredientId(): string {
+    let id: string;
+    do {
+      id = `ing_${this.ingredientCounter++}`;
+    } while (Object.prototype.hasOwnProperty.call(this.ingredients, id));
+    return id;
   }
 
   addStepField() {
@@ -141,7 +159,7 @@ export class RecipeEditor implements OnInit {
         title: this.title,
         servings_base: this.servingsBase,
         is_public: this.isPublic,
-        ingredients: this.ingredients,
+        ingredients: this.getCleanIngredients(),
         steps: cleanSteps
       };
 
@@ -164,6 +182,19 @@ export class RecipeEditor implements OnInit {
     return Object.keys(obj); 
   }
 
+  private getCleanIngredients(): IngredientsMap {
+    return Object.fromEntries(Object.entries(this.ingredients).map(([id, ingredient]) => {
+      const description = ingredient.description?.trim();
+      const cleanIngredient = { ...ingredient };
+      if (description) {
+        cleanIngredient.description = description;
+      } else {
+        delete cleanIngredient.description;
+      }
+      return [id, cleanIngredient];
+    })) as IngredientsMap;
+  }
+
   exportToJSON() {
     if (!this.title) {
       alert(this.i18n.t('editor.exportNeedsTitle'));
@@ -182,7 +213,7 @@ export class RecipeEditor implements OnInit {
       title: this.title,
       servings_base: this.servingsBase,
       is_public: this.isPublic,
-      ingredients: this.ingredients,
+      ingredients: this.getCleanIngredients(),
       steps: cleanSteps
     };
 
@@ -219,6 +250,7 @@ export class RecipeEditor implements OnInit {
         this.servingsBase = importedRecipe.servings_base || 4;
         this.isPublic = importedRecipe.is_public === true;
         this.ingredients = importedRecipe.ingredients;
+        this.updateIngredientCounter();
         
         this.steps = importedRecipe.steps.map((step: any) => ({
           id: step.id,

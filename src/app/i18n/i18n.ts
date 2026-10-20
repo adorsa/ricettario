@@ -44,6 +44,8 @@ const english = {
   'editor.baseServings': 'Base servings',
   'editor.publicDescription': 'Make this recipe public to authenticated users. Only you can edit it.',
   'editor.ingredients': 'Ingredients',
+  'editor.ingredientDescription': 'Ingredient notes (optional)',
+  'editor.ingredientDescriptionPlaceholder': 'e.g. Toast the spices before adding.',
   'editor.ingredientName': 'Ingredient name',
   'editor.quantity': 'Qty (e.g. 200)',
   'editor.unit': 'Unit (e.g. g, ml)',
@@ -91,6 +93,7 @@ const english = {
   'timer.defaultLabel': 'Timer',
   'timer.onHold': 'On hold',
   'parser.missingIngredient': '[missing ingredient]',
+  'parser.ingredientNoteAvailable': 'Ingredient note',
   'parser.quantityOf': 'of'
 } as const;
 
@@ -140,6 +143,8 @@ const italian: Record<TranslationKey, string> = {
   'editor.baseServings': 'Porzioni base',
   'editor.publicDescription': 'Rendi pubblica la ricetta per gli utenti autenticati. Solo tu puoi modificarla.',
   'editor.ingredients': 'Ingredienti',
+  'editor.ingredientDescription': 'Note ingrediente (opzionali)',
+  'editor.ingredientDescriptionPlaceholder': 'es. Tostare le spezie prima di aggiungerle.',
   'editor.ingredientName': 'Nome ingrediente',
   'editor.quantity': 'Quantità (es. 200)',
   'editor.unit': 'Unità (es. g, ml)',
@@ -187,6 +192,7 @@ const italian: Record<TranslationKey, string> = {
   'timer.defaultLabel': 'Timer',
   'timer.onHold': 'In attesa',
   'parser.missingIngredient': '[ingrediente mancante]',
+  'parser.ingredientNoteAvailable': 'Nota ingrediente',
   'parser.quantityOf': 'di'
 };
 
