@@ -221,6 +221,7 @@ const japanese: Record<TranslationKey, string> = {
   'recipes.new': '新しいレシピをつくる',
   'recipes.loading': 'レシピを読み込み中...',
   'recipes.empty': 'レシピがまだありません。上の「新しいレシピをつくる」から始めましょう。',
+  'recipes.loginRequired': 'ログインまたは登録してください。',
   'recipes.baseServings': '基本の分量: {{count}}人前',
   'recipes.delete': 'レシピを削除',
   'recipes.deleteConfirm': 'このレシピを本当に削除しますか？',
@@ -243,6 +244,8 @@ const japanese: Record<TranslationKey, string> = {
   'editor.baseServings': '基本の分量（人前）',
   'editor.publicDescription': 'このレシピを他の認証ユーザーに公開します（編集できるのはあなただけです）。',
   'editor.ingredients': '材料',
+  'editor.ingredientDescription': '材料詳細（任意）',
+  'editor.ingredientDescriptionPlaceholder': 'e.g. Toast the spices before adding.',
   'editor.ingredientName': '材料名',
   'editor.quantity': '数値 (例: 200)',
   'editor.unit': '単位 (例: g, ml)',
@@ -254,7 +257,7 @@ const japanese: Record<TranslationKey, string> = {
   'editor.stepId': '手順ID (一意の識別子)',
   'editor.stepIdPlaceholder': '例: sauce_prep',
   'editor.dependencies': '前提手順・依存関係（カンマ区切り）',
-  'editor.dependenciesPlaceholder': '例: id_passaggio_precedente, cooking:rem<=10',
+  'editor.dependenciesPlaceholder': '例: id_previous_step, cooking:rem<=10',
   'editor.instructions': '指示内容説明文',
   'editor.instructionsPlaceholder': '手順の説明を入力してください。タイマーを設定するには [t:15:ラベル]、材料を参照するには [i:ing_id] を使用します。',
   'editor.addStep': '手順を追加',
@@ -292,6 +295,7 @@ const japanese: Record<TranslationKey, string> = {
   'timer.defaultLabel': 'タイマー',
   'timer.onHold': '保留中（ウェイト）',
   'parser.missingIngredient': '[材料が見つかりません]',
+  'parser.ingredientNoteAvailable': '材料詳細',
   'parser.quantityOf': 'の'
 };
 
