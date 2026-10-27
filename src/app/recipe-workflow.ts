@@ -24,7 +24,7 @@ export class RecipeWorkflow {
         continue;
       }
 
-      const isSuspended = activeSuspends.some(t => t.id === step.id);
+      const isSuspended = activeSuspends.some(timer => timer.stepId === step.id);
       if (isSuspended) {
         statuses[step.id] = 'PENDING';
         continue;
@@ -73,7 +73,7 @@ export class RecipeWorkflow {
   }
 
   markStepAsCompleted(stepId: string) {
-    this.timer.removeTimerOrHold(stepId);
+    this.timer.removeTimersForStep(stepId);
     this.completedStepIds.update(ids => {
       if (!ids.includes(stepId)) {
         return [...ids, stepId];
