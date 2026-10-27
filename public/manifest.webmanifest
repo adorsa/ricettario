@@ -1,0 +1,25 @@
+{
+  "name": "Ricettario",
+  "short_name": "Ricettario",
+  "description": "Organizza le tue ricette e segui ogni passaggio mentre cucini.",
+  "lang": "it",
+  "start_url": "/recipes",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#047857",
+  "icons": [
+    {
+      "src": "icons/ricettario-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/ricettario-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

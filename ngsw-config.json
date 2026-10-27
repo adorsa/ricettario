@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/*.css",
+          "/*.js",
+          "/manifest.webmanifest",
+          "/icons/ricettario.svg",
+          "/icons/ricettario-180.png",
+          "/icons/ricettario-192.png",
+          "/icons/ricettario-512.png"
+        ]
+      }
+    }
+  ]
+}

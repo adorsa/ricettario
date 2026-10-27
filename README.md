@@ -36,6 +36,12 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Progressive Web App
+
+The production build includes an installable web app manifest and an Angular service worker. Serve the production output over HTTPS (or `localhost`) to test installation and offline behavior; the development server intentionally does not register the service worker.
+
+The service worker caches the application shell so the app can reopen offline. Recipe data and authentication are provided by Supabase and still require a network connection. Update the app icon in `public/icons/ricettario.svg` and its manifest entry in `public/manifest.webmanifest` when rebranding.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
