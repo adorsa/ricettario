@@ -1,12 +1,14 @@
-import { signal, computed, Service, inject } from '@angular/core';
+import { signal, computed, Service, inject, effect } from '@angular/core';
 import { Subject } from 'rxjs';
 import { I18n } from './i18n/i18n';
 import { StepTimer } from './timer.model';
+import { Supabase } from './supabase';
 
-const STORAGE_KEY = 'ricettario-timers';
+const STORAGE_PREFIX = 'ricettario-timers:';
 
 export interface ActiveTimer {
   id: string;
+  userId: string | null;
   stepId: string;
   label: string;
   type: 'COUNTDOWN' | 'ON_HOLD';
@@ -20,7 +22,9 @@ export interface ActiveTimer {
 @Service()
 export class Timer {
   private i18n = inject(I18n);
+  private supabase = inject(Supabase);
   private activeTimersSignal = signal<ActiveTimer[]>([]);
+  private activeUserId: string | null = null;
 
   activeTimers = computed(() => this.activeTimersSignal());
 
@@ -32,9 +36,16 @@ export class Timer {
       .filter(timer => timer.type === 'COUNTDOWN' && timer.isRunning)
       .forEach(timer => this.tick(timer.id));
   };
+  private userEffect = effect(() => {
+    if (this.supabase.authReady()) {
+      this.activateUser(this.supabase.currentUser()?.id ?? null);
+    }
+  });
 
   constructor() {
-    this.restoreTimers();
+    if (this.supabase.authReady()) {
+      this.activateUser(this.supabase.currentUser()?.id ?? null);
+    }
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibilityChange);
     }
@@ -42,11 +53,13 @@ export class Timer {
 
   startCountdown(stepId: string, stepTimer: StepTimer) {
     const label = stepTimer.label || this.i18n.t('timer.defaultLabel');
-    const id = this.getTimerId(stepId, label);
+    const userId = this.activeUserId;
+    const id = this.getTimerId(userId, stepId, label);
     const totalSeconds = stepTimer.minutes * 60;
     this.removeTimerOrHold(id);
     const newTimer: ActiveTimer = {
       id,
+      userId,
       stepId,
       label,
       type: 'COUNTDOWN',
@@ -67,11 +80,13 @@ export class Timer {
 
   putOnHold(stepId: string, label: string) {
     const timerLabel = label || this.i18n.t('timer.onHold');
-    const id = this.getTimerId(stepId, timerLabel);
+    const userId = this.activeUserId;
+    const id = this.getTimerId(userId, stepId, timerLabel);
     this.removeTimerOrHold(id);
 
     const newHoldItem: ActiveTimer = {
       id,
+      userId,
       stepId,
       label: timerLabel,
       type: 'ON_HOLD',
@@ -162,6 +177,17 @@ export class Timer {
     this.persistTimers();
   }
 
+  checkExpiredTimersForSteps(stepIds: string[]) {
+    for (const stepId of new Set(stepIds)) {
+      const timers = this.activeTimersSignal().filter(timer => timer.stepId === stepId);
+      if (timers.length > 0 && timers.every(timer =>
+        timer.type === 'COUNTDOWN' && !timer.isRunning && timer.timeRemaining === 0
+      )) {
+        this.onItemCompletedSubject.next({ stepId });
+      }
+    }
+  }
+
   getTimeRemainingMinutes(stepId: string): number {
     const countdowns = this.activeTimersSignal()
       .filter(timer => timer.stepId === stepId && timer.type === 'COUNTDOWN');
@@ -197,8 +223,8 @@ export class Timer {
     }
   }
 
-  private getTimerId(stepId: string, label: string): string {
-    return JSON.stringify([stepId, label]);
+  private getTimerId(userId: string | null, stepId: string, label: string): string {
+    return JSON.stringify([userId, stepId, label]);
   }
 
   private completeStepIfTimersAreDone(stepId: string) {
@@ -210,14 +236,31 @@ export class Timer {
     }
   }
 
-  private restoreTimers() {
+  private activateUser(userId: string | null) {
+    if (userId === this.activeUserId) return;
+
+    this.activeTimersSignal().forEach(timer => {
+      if (timer.intervalId) clearInterval(timer.intervalId);
+    });
+    this.activeTimersSignal.set([]);
+    this.activeUserId = userId;
+    if (userId) this.restoreTimers(userId);
+  }
+
+  private getStorageKey(userId: string): string {
+    return `${STORAGE_PREFIX}${userId}`;
+  }
+
+  private restoreTimers(userId: string) {
+    const storageKey = this.getStorageKey(userId);
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (!saved) return;
 
       const persistedTimers = JSON.parse(saved) as Omit<ActiveTimer, 'intervalId'>[];
       const restored = persistedTimers.filter(timer =>
         typeof timer.id === 'string' &&
+        timer.userId === userId &&
         typeof timer.stepId === 'string' &&
         typeof timer.label === 'string' &&
         (timer.type === 'COUNTDOWN' || timer.type === 'ON_HOLD')
@@ -241,7 +284,7 @@ export class Timer {
       if (restored.length !== persistedTimers.length) this.persistTimers();
     } catch {
       try {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(storageKey);
       } catch {
         this.activeTimersSignal.set([]);
       }
@@ -249,14 +292,17 @@ export class Timer {
   }
 
   private persistTimers() {
+    const userId = this.activeUserId;
+    if (!userId) return;
+
     try {
       const timers = this.activeTimersSignal();
       if (timers.length === 0) {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(this.getStorageKey(userId));
         return;
       }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(timers.map(({ intervalId, ...timer }) => timer)));
+      localStorage.setItem(this.getStorageKey(userId), JSON.stringify(timers.map(({ intervalId, ...timer }) => timer)));
     } catch {
       // Storage can be unavailable in private browsing or restricted contexts.
     }

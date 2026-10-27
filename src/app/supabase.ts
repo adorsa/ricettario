@@ -8,9 +8,11 @@ export class Supabase {
   private supabase: SupabaseClient;
   
   private currentUserSignal = signal<User | null>(null);
+  private authReadySignal = signal(false);
 
   currentUser = computed(() => this.currentUserSignal());
   isAuthenticated = computed(() => this.currentUserSignal() !== null);
+  authReady = computed(() => this.authReadySignal());
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
@@ -30,16 +32,18 @@ export class Supabase {
     }
 
     this.supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        this.currentUserSignal.set(data.session.user);
-      } else {
-        this.currentUserSignal.set(null);
-      }
+      this.currentUserSignal.set(data.session?.user ?? null);
+      this.authReadySignal.set(true);
+    }).catch(error => {
+      console.error('Error loading the auth session:', error);
+      this.currentUserSignal.set(null);
+      this.authReadySignal.set(true);
     });
 
     this.supabase.auth.onAuthStateChange((event, session) => {
       console.log(`Supabase Auth Event: ${event}`);
       this.currentUserSignal.set(session?.user ?? null);
+      this.authReadySignal.set(true);
     });
   }
 

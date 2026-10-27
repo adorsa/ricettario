@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Supabase } from './../supabase';
-import { Router } from '@angular/router';
 import { I18n } from '../i18n/i18n';
 
 @Component({
@@ -14,7 +13,6 @@ import { I18n } from '../i18n/i18n';
 })
 export class Auth {
   private supabaseService = inject(Supabase);
-  private router = inject(Router);
   public i18n = inject(I18n);
 
   email = '';
@@ -42,7 +40,6 @@ export class Auth {
       if (this.isLoginMode()) {
         await this.supabaseService.signIn(this.email, this.password);
         this.successMessage.set('auth.loginSuccess');
-        this.router.navigate(['/']);
       } else {
         await this.supabaseService.signUp(this.email, this.password);
         this.successMessage.set('auth.signupSuccess');

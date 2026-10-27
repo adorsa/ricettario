@@ -7,6 +7,7 @@ import { ActiveRecipe } from './../active-recipe';
 import { RecipeStep } from './../recipe.model';
 import { I18n } from './../i18n/i18n';
 import { StepTimer } from '../timer.model';
+import { Supabase } from '../supabase';
 
 @Component({
   selector: 'app-recipe-work-mode',
@@ -22,6 +23,7 @@ export class RecipeWorkMode implements OnInit {
   private route = inject(ActivatedRoute);
   public activeRecipe = inject(ActiveRecipe);
   public i18n = inject(I18n);
+  private supabase = inject(Supabase);
 
   private pausePhraseKeys = ['work.pause0', 'work.pause1', 'work.pause2', 'work.pause3'] as const;
 
@@ -58,17 +60,21 @@ export class RecipeWorkMode implements OnInit {
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    const user = this.supabase.currentUser();
+    if (id && user) {
       try {
         const recipeData = await this.activeRecipe.loadRecipe(id);
         if (recipeData) {
-          this.workflow.initWorkflow();
+          this.workflow.ensureWorkflow(id, user.id, recipeData.steps.map(step => step.id));
           this.rotateIdleMessage();
         }
       } catch (err) {
         console.error('Unable to load the recipe workflow:', err);
+        this.workflow.clearWorkflow();
         this.router.navigate(['/recipes']);
       }
+    } else {
+      this.router.navigate(['/auth']);
     }
   }
 
@@ -130,6 +136,7 @@ export class RecipeWorkMode implements OnInit {
   }
 
   exitWorkMode() {
+    this.workflow.clearWorkflow();
     const recipe = this.activeRecipe.recipe();
     if (recipe && recipe.id) {
       this.router.navigate(['/recipes', recipe.id]);

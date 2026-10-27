@@ -6,6 +6,7 @@ import { RecipeParser } from '../recipe-parser';
 import { Timer } from '../timer';
 import { Supabase } from '../supabase';
 import { I18n } from '../i18n/i18n';
+import { RecipeWorkflow } from '../recipe-workflow';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -21,6 +22,7 @@ export class RecipeDetail implements OnInit {
   private parserService = inject(RecipeParser);
   private timerService = inject(Timer);
   private supabaseService = inject(Supabase);
+  private workflow = inject(RecipeWorkflow);
   public i18n = inject(I18n);
 
   recipe = computed(() => this.activeRecipe.recipe());
@@ -97,8 +99,12 @@ export class RecipeDetail implements OnInit {
 
   startWorkMode() {
     const currentRecipe = this.recipe();
-    if (currentRecipe && currentRecipe.id) {
+    const user = this.supabaseService.currentUser();
+    if (currentRecipe?.id && user) {
+      this.workflow.startWorkflow(currentRecipe.id, user.id);
       this.router.navigate(['/recipes', currentRecipe.id, 'work']);
+    } else {
+      this.router.navigate(['/auth']);
+    }
   }
-}
 }
