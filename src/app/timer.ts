@@ -36,11 +36,11 @@ export class Timer {
       .filter(timer => timer.type === 'COUNTDOWN' && timer.isRunning)
       .forEach(timer => this.tick(timer.id));
   };
-  private userEffect = effect(() => {
+  /*private userEffect = effect(() => {
     if (this.supabase.authReady()) {
       this.activateUser(this.supabase.currentUser()?.id ?? null);
     }
-  });
+  });*/
 
   constructor() {
     if (this.supabase.authReady()) {
