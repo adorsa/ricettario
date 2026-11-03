@@ -10,14 +10,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
-      registrationStrategy: () => {
-        const appRef = inject(ApplicationRef);
-        
-        return appRef.isStable.pipe(
-          filter((stable) => stable === true),
-          take(1)
-        );
-      }
+      registrationStrategy: 'registerWhenStable:30000'
     })
   ]
 };
